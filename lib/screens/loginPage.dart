@@ -1,4 +1,5 @@
 import 'package:education_community/screens/HomePage.dart';
+import 'package:education_community/screens/addNewUsersData.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -26,9 +27,14 @@ class _LogInPageState extends State<LogInPage> {
       print("The error is $error");
     });
     googleSignIn.signInSilently(suppressErrors: false).then((account) {
-      //  circularProgressIndicatorX();
+      spinnerWhile();
+
       handelSignInAccount(account);
     });
+  }
+
+  Widget spinnerWhile() {
+    return CircularProgressIndicator();
   }
 
   handelSignInAccount(GoogleSignInAccount account) {
@@ -50,7 +56,9 @@ class _LogInPageState extends State<LogInPage> {
   }
 
   loggedInHomepage() {
-    return Homepage();
+    return Homepage(
+      user: googleSignIn.currentUser,
+    );
   }
 
   Widget firstSignInPage() {
@@ -106,7 +114,9 @@ class _LogInPageState extends State<LogInPage> {
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (context) {
-                            return Homepage();
+                            return AddNewUsersData(
+                              user: result,
+                            );
                           },
                         ),
                       );
