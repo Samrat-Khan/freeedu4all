@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "870940068476-itmcphi670pjbjmn5fgt1e3e2c758l3v.apps.googleusercontent.com",
+          "client_id": "870940068476-9gs8a82lc24ebuo5695pev5qpgu1kc6h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.delit.education_community",
-            "certificate_hash": "1147caf068b010de78ded97fccf8a4602466fd98"
+            "certificate_hash": "ff5461de2f6f6c58abaccffc5d5cb27eb9f69fb6"
           }
         },
         {

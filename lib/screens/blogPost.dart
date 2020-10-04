@@ -1,20 +1,33 @@
 import 'dart:io';
 
+import 'package:education_community/screens/HomePage.dart';
+import 'package:education_community/services/firebase_service_for_setData.dart';
+import 'package:education_community/services/photo_picker.dart';
+import 'package:education_community/services/user_service.dart';
+import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:uuid/uuid.dart';
 
 class BlogPost extends StatefulWidget {
+  static const Route = "Blog_Post_Page";
   @override
   _BlogPostState createState() => _BlogPostState();
 }
 
 class _BlogPostState extends State<BlogPost> {
-  String problemText, postTitleText, postDetailText;
+  String blogTitle, blogDetail;
+  String blogPhotoUrl;
   File imageFile;
-  bool isAllFieldEmpty = true;
-
+  String _result = "Fix";
+  int _radioValue = 0;
+  bool fieldIsEmpty;
+  String blogId = Uuid().v4();
   TextEditingController _titleTextController = TextEditingController();
   TextEditingController _detailTextController = TextEditingController();
+  int timeStamp = DateTime.now().microsecondsSinceEpoch;
+  bool _inAsyncCall = false;
 
   @override
   void dispose() {
@@ -25,58 +38,45 @@ class _BlogPostState extends State<BlogPost> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fieldIsEmpty = true;
+  }
+
+  @override
   Widget build(BuildContext context) {
     var _height = MediaQuery.of(context).size.height;
     var _width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      appBar: postAppBar(),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            photoUploadContainer(_width, _height),
-            SizedBox(
-              height: 25,
-            ),
-            postTitleWriteBox(),
-            SizedBox(
-              height: 25,
-            ),
-            postDetailWriteBox(),
-            SizedBox(
-              height: 25,
-            ),
-            problemText == null ? SizedBox(height: 5) : Text(problemText),
-            SizedBox(
-              height: 20,
-            ),
-            postTypeSelectRow(),
-          ],
+    return ModalProgressHUD(
+      inAsyncCall: _inAsyncCall,
+      child: Scaffold(
+        appBar: postAppBar(),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(15),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              photoUploadContainer(_width, _height),
+              SizedBox(
+                height: 10,
+              ),
+              postTypeSelectRow(),
+              SizedBox(
+                height: 10,
+              ),
+              postTitleWriteBox(),
+              SizedBox(
+                height: 25,
+              ),
+              postDetailWriteBox(),
+            ],
+          ),
         ),
       ),
     );
   }
-
-  checkTextFieldEmptyOrNot() {
-    if (_titleTextController.text.isEmpty ||
-        _detailTextController.text.isEmpty ||
-        imageFile == null ||
-        problemText == null) {
-      setState(() {
-        this.isAllFieldEmpty = true;
-      });
-    } else {
-      setState(() {
-        this.isAllFieldEmpty = false;
-      });
-    }
-  }
-
-  fillAllDataFieldsAlert(BuildContext context) {}
-
-  dataUploadToFirebase() {}
 
   AppBar postAppBar() {
     return AppBar(
@@ -86,18 +86,40 @@ class _BlogPostState extends State<BlogPost> {
       leading: IconButton(
         icon: Icon(Icons.cancel),
         onPressed: () {
-          _detailTextController.dispose();
-          _titleTextController.dispose();
           imageFile = null;
+
           Navigator.pop(context);
         },
       ),
       actions: [
         IconButton(
           icon: Icon(Icons.cloud_upload),
-          onPressed: isAllFieldEmpty == true
-              ? fillAllDataFieldsAlert(context)
-              : dataUploadToFirebase,
+          onPressed: () {
+            fieldIsEmpty = checkAllFieldAreFullOrNot();
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                content: fieldIsEmpty
+                    ? Text(
+                        "One Or More Field Is Empty",
+                        style: kWarningText,
+                      )
+                    : null,
+                actions: [
+                  FlatButton.icon(
+                    onPressed: fieldIsEmpty ? null : dataUploadToFirebase,
+                    label: Text("Upload"),
+                    icon: Icon(Icons.upload_outlined),
+                  ),
+                  FlatButton.icon(
+                    onPressed: draftBlogDataToFirebase,
+                    label: Text("Save As Draft"),
+                    icon: Icon(Icons.drafts_outlined),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ],
     );
@@ -105,14 +127,15 @@ class _BlogPostState extends State<BlogPost> {
 
   InkWell photoUploadContainer(double _width, double _height) {
     return InkWell(
+      onTap: imagePicFromGallery,
       child: Container(
         width: _width,
         height: _height / 5,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: imageFile == null
-                ? AssetImage("images/no-image.jpg")
-                : FileImage(imageFile),
+            image: imageFile != null
+                ? FileImage(imageFile)
+                : AssetImage("images/no-image.jpg"),
             fit: BoxFit.cover,
           ),
         ),
@@ -142,7 +165,7 @@ class _BlogPostState extends State<BlogPost> {
         controller: _titleTextController,
         onChanged: (String text) {
           setState(() {
-            postTitleText = text;
+            blogTitle = text;
           });
         },
       ),
@@ -167,7 +190,7 @@ class _BlogPostState extends State<BlogPost> {
         controller: _detailTextController,
         onChanged: (String text) {
           setState(() {
-            postDetailText = text;
+            blogDetail = text;
           });
         },
       ),
@@ -176,48 +199,130 @@ class _BlogPostState extends State<BlogPost> {
 
   Row postTypeSelectRow() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        OutlineButton(
-          splashColor: Color(0xffd788d7),
-          borderSide: BorderSide(
-            color: Color(0xff07689f),
-            width: 1.5,
-          ),
-          child: Text("Help"),
-          onPressed: () {
-            setState(() {
-              problemText = "Help";
-            });
-          },
-        ),
-        OutlineButton(
-          splashColor: Color(0xff9d65ca),
-          borderSide: BorderSide(
-            color: Color(0xfffec93b),
-            width: 1.5,
-          ),
-          child: Text("Solution"),
-          onPressed: () {
-            setState(() {
-              problemText = "Solution";
-            });
-          },
-        ),
-        OutlineButton(
-          splashColor: Color(0xff5d54a3),
-          borderSide: BorderSide(
-            color: Color(0xffa2d5f2),
-            width: 1.5,
-          ),
-          child: Text("Info"),
-          onPressed: () {
-            setState(() {
-              problemText = "Info";
-            });
-          },
-        ),
+        Radio(
+            value: 0,
+            groupValue: _radioValue,
+            onChanged: _handleRadioValueChange),
+        Text("Fix"),
+        Radio(
+            value: 1,
+            groupValue: _radioValue,
+            onChanged: _handleRadioValueChange),
+        Text("Info"),
+        Radio(
+            value: 2,
+            groupValue: _radioValue,
+            onChanged: _handleRadioValueChange),
+        Text("Help"),
+        Radio(
+            value: 3,
+            groupValue: _radioValue,
+            onChanged: _handleRadioValueChange),
+        Text("Giveaway"),
       ],
     );
+  }
+
+  void _handleRadioValueChange(int value) {
+    setState(() {
+      _radioValue = value;
+
+      switch (_radioValue) {
+        case 0:
+          _result = "Fix";
+
+          break;
+        case 1:
+          _result = "Info";
+
+          break;
+        case 2:
+          _result = "Help";
+
+          break;
+        case 3:
+          _result = "Giveaway";
+
+          break;
+      }
+    });
+  }
+
+  PhotoPicker photoPicker = PhotoPicker();
+  bool checkAllFieldAreFullOrNot() {
+    if (_titleTextController.text.isEmpty ||
+        _detailTextController.text.isEmpty ||
+        imageFile == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  dataUploadToFirebase() async {
+    setState(() {
+      _inAsyncCall = true;
+    });
+    FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
+    blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
+        imageFile, googleSignIn.currentUser.id, blogId);
+    fireBaseService
+        .updateBlogDataToFirebase(
+      blogTitle: blogTitle,
+      blogDetail: blogDetail,
+      blogUid: blogId,
+      timeStamp: timeStamp,
+      blogPhotoUrl: blogPhotoUrl,
+      blogType: _result,
+    )
+        .whenComplete(
+      () {
+        Navigator.pop(context);
+      },
+    );
+    setState(() {
+      _inAsyncCall = false;
+    });
+  }
+
+  draftBlogDataToFirebase() async {
+    setState(() {
+      _inAsyncCall = true;
+    });
+
+    FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
+    if (imageFile != null) {
+      blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
+          imageFile, googleSignIn.currentUser.id, blogId);
+    }
+
+    fireBaseService
+        .saveBlogAsDraft(
+      blogDetail: blogDetail,
+      blogTitle: blogTitle,
+      blogPhotoUrl: blogPhotoUrl,
+      blogType: _result,
+      blogUid: blogId,
+      timeStamp: timeStamp,
+    )
+        .whenComplete(
+      () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Homepage(),
+          ),
+        );
+      },
+    );
+    setState(() {
+      _inAsyncCall = false;
+    });
+  }
+
+  imagePicFromGallery() async {
+    imageFile = await photoPicker.pickImageFromGallery();
   }
 }

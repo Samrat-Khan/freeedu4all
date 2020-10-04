@@ -3,8 +3,10 @@ import 'package:education_community/screens/addNewUsersData.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class LogInPage extends StatefulWidget {
+  static const Route = "/LogIn_Page";
   @override
   _LogInPageState createState() => _LogInPageState();
 }
@@ -13,31 +15,25 @@ class _LogInPageState extends State<LogInPage> {
   bool isLoggedIn = false;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     checkIsLoggedIn();
   }
 
   UserService userService = UserService();
+
   checkIsLoggedIn() async {
     isLoggedIn = await googleSignIn.isSignedIn();
+
     googleSignIn.onCurrentUserChanged.listen((account) {
       handelSignInAccount(account);
-    }).onError((error) {
-      print("The error is $error");
-    });
-    googleSignIn.signInSilently(suppressErrors: false).then((account) {
-      spinnerWhile();
+    }).onError((error) {});
 
+    googleSignIn.signInSilently(suppressErrors: false).then((account) {
       handelSignInAccount(account);
     });
   }
 
-  Widget spinnerWhile() {
-    return CircularProgressIndicator();
-  }
-
-  handelSignInAccount(GoogleSignInAccount account) {
+  handelSignInAccount(GoogleSignInAccount account) async {
     if (account != null) {
       userService.signInWithGoogle();
       setState(() {
@@ -52,84 +48,105 @@ class _LogInPageState extends State<LogInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return isLoggedIn == true ? loggedInHomepage() : firstSignInPage();
-  }
-
-  loggedInHomepage() {
-    return Homepage(
-      user: googleSignIn.currentUser,
-    );
+    return isLoggedIn ? Homepage() : firstSignInPage();
   }
 
   Widget firstSignInPage() {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          // crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              height: 100,
-              width: 100,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("images/14.png"),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            InkWell(
-              child: Container(
-                width: MediaQuery.of(context).size.width / 1.85,
+    return ModalProgressHUD(
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            // crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: 100,
+                width: 100,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                padding: EdgeInsets.all(5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      "Sign In with",
-                      style: TextStyle(fontSize: 25),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Image.asset(
-                      "images/google.png",
-                      width: 30,
-                      height: 30,
-                    ),
-                  ],
+                  image: DecorationImage(
+                    image: AssetImage("images/14.png"),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-              onTap: () {
-                try {
-                  UserService userService = UserService();
-                  userService.signInWithGoogle().then((result) {
-                    if (result != null) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return AddNewUsersData(
-                              user: result,
-                            );
-                          },
-                        ),
-                      );
-                    }
-                  });
-                } catch (e) {
-                  print(e);
-                }
-              },
-            ),
-          ],
+              SizedBox(
+                height: 20,
+              ),
+              InkWell(
+                child: Container(
+                  width: MediaQuery.of(context).size.width / 1.85,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  padding: EdgeInsets.all(5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        "Sign In with",
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Image.asset(
+                        "images/google.png",
+                        width: 30,
+                        height: 30,
+                      ),
+                    ],
+                  ),
+                ),
+                onTap: () {
+                  try {
+                    setState(() {
+                      _inAsyncCall = true;
+                    });
+                    UserService userService = UserService();
+                    userService.signInWithGoogle().then((result) async {
+                      bool _result = await userService
+                          .checkIfUserAlreadyExist(googleSignIn.currentUser.id);
+
+                      if (_result == true) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) => Homepage(),
+                          ),
+                        );
+                        setState(() {
+                          _inAsyncCall = false;
+                        });
+                      } else {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return AddNewUsersData(
+                                user: result,
+                              );
+                            },
+                          ),
+                        );
+                        setState(() {
+                          _inAsyncCall = false;
+                        });
+                      }
+                    });
+                  } catch (e) {
+                    print("An Error occurs $e");
+
+                    setState(() {
+                      _inAsyncCall = false;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
+      inAsyncCall: _inAsyncCall,
     );
   }
+
+  bool _inAsyncCall = false;
 }
