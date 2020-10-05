@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class CommentPage extends StatefulWidget {
-  static const Route = "Comment_Page";
   final String blogUID;
   CommentPage({this.blogUID});
   @override

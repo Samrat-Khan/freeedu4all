@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MyProfilePage extends StatefulWidget {
-  static const Route = "My_Profile_Page";
   @override
   _MyProfilePageState createState() => _MyProfilePageState();
 }
@@ -75,11 +74,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(
+              Navigator.pushNamed(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => SettingsPage(),
-                ),
+                "SettingsPage",
+                arguments: SettingsPage(),
               );
             },
           ),
@@ -136,10 +134,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           ),
                           color: Colors.green,
                           onPressed: () {
-                            Navigator.push(
+                            Navigator.pushNamed(
                               context,
-                              MaterialPageRoute(
-                                  builder: (context) => EditProfilePage()),
+                              "EditProfilePage",
+                              arguments: EditProfilePage(),
                             );
                           },
                         ),
@@ -246,7 +244,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
               itemBuilder: (context, index) {
                 DocumentSnapshot ds = snapshot.data.documents[index];
                 var _height = MediaQuery.of(context).size.height;
-                var _width = MediaQuery.of(context).size.width;
+                // var _width = MediaQuery.of(context).size.width;
                 return Padding(
                   padding: EdgeInsets.all(15),
                   child: Card(

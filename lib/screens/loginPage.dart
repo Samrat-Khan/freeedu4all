@@ -1,12 +1,11 @@
+import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/screens/HomePage.dart';
-import 'package:education_community/screens/addNewUsersData.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class LogInPage extends StatefulWidget {
-  static const Route = "/LogIn_Page";
   @override
   _LogInPageState createState() => _LogInPageState();
 }
@@ -108,24 +107,19 @@ class _LogInPageState extends State<LogInPage> {
                           .checkIfUserAlreadyExist(googleSignIn.currentUser.id);
 
                       if (_result == true) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => Homepage(),
-                          ),
+                        Navigator.of(context).pushNamed(
+                          "Homepage",
+                          arguments: Homepage(),
                         );
                         setState(() {
                           _inAsyncCall = false;
                         });
                       } else {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return AddNewUsersData(
-                                user: result,
-                              );
-                            },
-                          ),
+                        Navigator.of(context).pushNamed(
+                          "AddNewUserDataPage",
+                          arguments: LoginToNewUser(result),
                         );
+
                         setState(() {
                           _inAsyncCall = false;
                         });

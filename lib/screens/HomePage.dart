@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/screens/blogPost.dart';
-import 'package:education_community/screens/blogReadingPage.dart';
-import 'package:education_community/screens/myProfilePage.dart';
-import 'package:education_community/services/firebase_service_for_setData.dart';
+import 'package:education_community/routes/routeDataPass.dart';
+import 'package:education_community/widgets/loadingWidget.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +8,6 @@ import 'package:flutter/rendering.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class Homepage extends StatefulWidget {
-  static const Route = "Home_Page";
   final GoogleSignInAccount user;
   Homepage({this.user});
   @override
@@ -29,8 +26,10 @@ class _HomepageState extends State<Homepage> {
             IconButton(
               icon: Icon(Icons.account_circle_rounded),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MyProfilePage()));
+                Navigator.pushNamed(
+                  context,
+                  "MyProfilePage",
+                );
               },
             ),
           ],
@@ -38,11 +37,8 @@ class _HomepageState extends State<Homepage> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.add),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BlogPost(),
-              ),
+            Navigator.of(context).pushNamed(
+              "BlogPostPage",
             );
           },
         ),
@@ -53,10 +49,10 @@ class _HomepageState extends State<Homepage> {
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Center(child: CircularProgressIndicator());
+              return Center(child: LoadingWidget());
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return Center(child: LoadingWidget());
             } else
               return ListView.builder(
                 itemCount: snapshot.data.documents.length,
@@ -109,29 +105,11 @@ class _HomepageState extends State<Homepage> {
                         ),
                       ),
                       onTap: () async {
-                        FirebaseServiceSetData fireBaseService =
-                            FirebaseServiceSetData();
-                        String blogOwnerPhotoUrl = await fireBaseService
-                            .blogAuthorDetail(ds.data()["BlogOwnerId"]);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BlogReadingPage(
-                              blogUID: ds.data()["BlogUid"],
-                              blogOwnerID: ds.data()["BlogOwnerId"],
-                              // blogTitle: ds.data()["BlogTitle"],
-                              // blogDetails: ds.data()["BlogDetail"],
-                              // blogPhotoUrl: ds.data()["BlogPhotoUrl"],
-
-                              // blogDateTime: ds.data()["DateTime"],
-                              // blogMicroSecond: ds.data()["TimeStamp"],
-                              // blogTotalLike: ds.data()["TotalLikes"],
-                              // blogOwnerDisplayName: ds.data()["BlogOwnerName"],
-                              // blogOwnerPhotoUrl: blogOwnerPhotoUrl,
-
-                              // userWhoLikeTF: ds.data()["Likes"]
-                              //     [googleSignIn.currentUser.id] ??= false,
-                            ),
+                        Navigator.of(context).pushNamed(
+                          "BlogReadPage",
+                          arguments: HomeToBlogRead(
+                            blogUID: ds.data()["BlogUid"],
+                            blogOwnerID: ds.data()["BlogOwnerId"],
                           ),
                         );
                       },

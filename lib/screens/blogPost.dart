@@ -11,7 +11,6 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:uuid/uuid.dart';
 
 class BlogPost extends StatefulWidget {
-  static const Route = "Blog_Post_Page";
   @override
   _BlogPostState createState() => _BlogPostState();
 }
@@ -279,7 +278,9 @@ class _BlogPostState extends State<BlogPost> {
     )
         .whenComplete(
       () {
-        Navigator.pop(context);
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => Homepage()),
+            (route) => false);
       },
     );
     setState(() {
@@ -309,12 +310,9 @@ class _BlogPostState extends State<BlogPost> {
     )
         .whenComplete(
       () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => Homepage(),
-          ),
-        );
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => Homepage()),
+            (route) => false);
       },
     );
     setState(() {

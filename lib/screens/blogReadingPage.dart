@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/services/firebase_service_forUpdataData.dart';
 import 'package:education_community/services/timeCalCulations.dart';
 import 'package:education_community/services/user_service.dart';
@@ -6,10 +7,7 @@ import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'commentPage.dart';
-
 class BlogReadingPage extends StatefulWidget {
-  static const Route = "Blog_Read_Page";
   final String blogUID, blogOwnerID;
 
   BlogReadingPage({
@@ -51,7 +49,6 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
           min = microToMin.minConvert(ds.data()["TimeStamp"]);
 
           return CustomScrollView(
-            shrinkWrap: true,
             slivers: [
               sliverAppBar(ds),
               SliverFillRemaining(
@@ -160,7 +157,8 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
         ),
       ),
       expandedHeight: 200,
-      pinned: true,
+      pinned: false,
+      floating: true,
       actions: [
         IconButton(icon: Icon(Icons.bookmark), onPressed: null),
       ],
@@ -189,12 +187,11 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
     return FloatingActionButton(
       child: Icon(Icons.comment_outlined),
       onPressed: () {
-        Navigator.push(
+        Navigator.pushNamed(
           context,
-          MaterialPageRoute(
-            builder: (context) => CommentPage(
-              blogUID: widget.blogUID,
-            ),
+          "CommentPage",
+          arguments: BlogReadToComment(
+            blogUID: widget.blogUID,
           ),
         );
       },

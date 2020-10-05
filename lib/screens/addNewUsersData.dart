@@ -8,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AddNewUsersData extends StatefulWidget {
-  static const Route = "Add_New_User_Data_Page";
   final User user;
 
   AddNewUsersData({this.user});
@@ -132,11 +131,9 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
             uid: widget.user.uid,
             userID: googleSignIn.currentUser.id)
         .whenComplete(() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Homepage(),
-        ),
+      Navigator.of(context).pushNamed(
+        "Homepage",
+        arguments: Homepage(),
       );
     });
   }

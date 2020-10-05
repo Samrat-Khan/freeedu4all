@@ -1,9 +1,10 @@
-import 'package:education_community/main.dart';
+import 'package:education_community/providerServices/darkTheme.dart';
+import 'package:education_community/screens/loginPage.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
-  static const Route = "Setting_Page";
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -16,9 +17,14 @@ class _SettingsPageState extends State<SettingsPage> {
     Icons.info,
     Icons.logout
   ];
+  bool isSwitch = false;
 
   changeTheme() {
-    print("Theme");
+    setState(() {
+      isSwitch = !isSwitch;
+      Provider.of<DarkToLightTheme>(context, listen: false)
+          .changeTheme(isSwitch);
+    });
   }
 
   readPrivacy() {
@@ -32,18 +38,17 @@ class _SettingsPageState extends State<SettingsPage> {
   logOut() {
     googleSignIn.signOut().whenComplete(
       () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyApp(),
-          ),
-        );
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (BuildContext context) => LogInPage()),
+            (route) => false);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    var themeProvider = Provider.of<DarkToLightTheme>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -53,7 +58,11 @@ class _SettingsPageState extends State<SettingsPage> {
         body: ListView.separated(
             itemBuilder: (context, index) {
               return ListTile(
-                leading: Icon(_settingsOptionsIcon[index]),
+                leading: index != 0
+                    ? Icon(_settingsOptionsIcon[index])
+                    : Icon(themeProvider.isDark
+                        ? Icons.nightlight_round
+                        : Icons.wb_sunny),
                 title: Text(_settingsOptionsName[index]),
                 trailing: Icon(Icons.arrow_forward_ios_rounded),
                 onTap: () {

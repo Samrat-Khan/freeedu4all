@@ -7,7 +7,6 @@ import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
 
 class EditProfilePage extends StatefulWidget {
-  static const Route = "EditProfilePage";
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
