@@ -24,7 +24,7 @@ class FirebaseServiceUpdateData {
 
   Future updateUserProfileData(
       {File photo, String name, String displayName, String bio}) async {
-    String userUniqueId = googleSignIn.currentUser.id;
+    String userUniqueId = currentUser.uid;
     if (photo != null) {
       String photoUrl = await updateUserProfilePhotoToFireStorage(photo);
       await firebaseFirestore.collection("Users").doc(userUniqueId).update(
@@ -47,7 +47,7 @@ class FirebaseServiceUpdateData {
   }
 
   Future<String> updateUserProfilePhotoToFireStorage(File fileImage) async {
-    String userUniqueId = googleSignIn.currentUser.id;
+    String userUniqueId = currentUser.uid;
     final StorageReference storageReference = firebaseStorage
         .ref()
         .child("UserImage/$userUniqueId/$userUniqueId.jpg");

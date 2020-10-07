@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/screens/editProfilePage.dart';
 import 'package:education_community/screens/settingsPage.dart';
+import 'package:education_community/services/countLikeComment.dart';
 import 'package:education_community/services/user_service.dart';
+import 'package:education_community/widgets/loadingWidget.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,7 @@ class MyProfilePage extends StatefulWidget {
 
 class _MyProfilePageState extends State<MyProfilePage> {
   String currentUserDisplayName, currentUserPhotoUrl;
-  int countTotalPost, countTotalLikes;
+  int countTotalPost, countTotalLikes, countTotalComment;
   List _tab = ["Publish", "Draft"];
   TabController _tabController;
   @override
@@ -22,6 +24,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
     super.initState();
   }
 
+  CountLikes _countLikes = CountLikes();
+  CountComments _comments = CountComments();
   Future getCurrentUserData() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
         .collection("Users")
@@ -36,6 +40,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         .where("BlogOwnerId", isEqualTo: googleSignIn.currentUser.id)
         .get();
     countTotalPost = getPost.docs.length;
+    countTotalLikes = await _countLikes.countLike();
   }
 
   @override
@@ -69,7 +74,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
           ],
         ),
-        backgroundColor: Colors.red,
         actions: [
           IconButton(
             icon: Icon(Icons.settings),
@@ -86,7 +90,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           future: getCurrentUserData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading");
+              return Center(child: LoadingWidget());
             }
             return Padding(
               padding: EdgeInsets.only(top: 40),
@@ -122,7 +126,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           children: [
                             Text(countTotalPost.toString()),
                             SizedBox(width: 25),
-                            Text("Likes"),
+                            Text(countTotalLikes.toString()),
                           ],
                         ),
                         SizedBox(height: 15),
@@ -166,13 +170,15 @@ class _MyProfilePageState extends State<MyProfilePage> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
-              child: Text("Loading....."),
+              child: Text("No Data",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
             );
           }
           return ListView.builder(
             itemCount: snapshot.data.documents.length,
             itemBuilder: (context, index) {
               DocumentSnapshot ds = snapshot.data.documents[index];
+
               return Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Card(
@@ -199,20 +205,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             ds.data()["BlogTitle"],
                             style: kCurrentUserBlogTitle,
                             overflow: TextOverflow.fade,
-                          ),
-                        ),
-                        Container(
-                          width: _width,
-                          height: _height / 12,
-                          padding: EdgeInsets.only(left: 15),
-                          child: Row(
-                            children: [
-                              Icon(Icons.thumb_up_alt),
-                              Text(ds.data()["TotalLikes"].toString()),
-                              SizedBox(width: 15),
-                              Icon(Icons.comment),
-                              Text(ds.data()["TotalLikes"].toString()),
-                            ],
                           ),
                         ),
                       ],

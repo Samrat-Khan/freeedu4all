@@ -36,7 +36,7 @@ class FirebaseServiceSetData {
       String uid,
       String userID}) async {
     CollectionReference userData = firebaseFirestore.collection("Users");
-    await userData.doc(userID).set({
+    await userData.doc(uid).set({
       "Name": fullName,
       "DisplayName": displayName,
       "Email": userEmail,
@@ -71,12 +71,12 @@ class FirebaseServiceSetData {
 
     DocumentSnapshot variable = await FirebaseFirestore.instance
         .collection('Users')
-        .doc(googleSignIn.currentUser.id)
+        .doc(currentUser.uid)
         .get();
     CollectionReference blogData = firebaseFirestore.collection("Blog");
 
     await blogData.doc(blogUid).set({
-      "BlogOwnerId": googleSignIn.currentUser.id,
+      "BlogOwnerId": currentUser.uid,
       "BlogOwnerName": variable.data()["DisplayName"],
       "BlogTitle": blogTitle,
       "BlogDetail": blogDetail,
@@ -109,7 +109,7 @@ class FirebaseServiceSetData {
     String month = monthFormat.getMonth(currentDateTime.month);
     CollectionReference draftBlog = firebaseFirestore.collection("DraftBlog");
     await draftBlog.doc(blogUid).set({
-      "BlogOwnerId": googleSignIn.currentUser.id,
+      "BlogOwnerId": currentUser.uid,
       "BlogTitle": blogTitle,
       "BlogDetail": blogDetail,
       "BlogType": blogType,

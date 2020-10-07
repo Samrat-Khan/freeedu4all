@@ -5,10 +5,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
-User currentUser;
+final User currentUser = firebaseAuth.currentUser;
+final String firebaseCurrentUserUid = currentUser.uid;
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 
-class UserService {
+class UserServiceForGoogleAuth {
   String name;
   String email;
   String imageUrl;
@@ -38,6 +39,7 @@ class UserService {
       imageUrl = user.photoURL;
       email = user.email;
     }
+
     return user;
   }
 
@@ -53,6 +55,34 @@ class UserService {
       return doc.exists;
     } catch (e) {
       throw e;
+    }
+  }
+}
+
+class UserServiceForEmailAuth {
+  Future signInWithEmailAndPassword(String email, String password) async {
+    try {
+      UserCredential userCredential = await firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
+      User user = userCredential.user;
+      assert(user != null);
+      assert(await user.getIdToken() != null);
+      return user;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future signUpWithEmailAndPassword(String email, String password) async {
+    try {
+      UserCredential userCredential = await firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+      User user = userCredential.user;
+      assert(user != null);
+      assert(await user.getIdToken() != null);
+      return user;
+    } catch (e) {
+      print(e);
     }
   }
 }

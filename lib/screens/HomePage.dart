@@ -21,7 +21,10 @@ class _HomepageState extends State<Homepage> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: Text("Edu Community"),
+          title: Text(
+            "Edu Community",
+            style: kAppTitle,
+          ),
           actions: [
             IconButton(
               icon: Icon(Icons.account_circle_rounded),

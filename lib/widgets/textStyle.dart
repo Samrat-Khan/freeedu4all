@@ -2,6 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+const kAppTitle = TextStyle(
+  fontFamily: 'electric_1',
+  fontWeight: FontWeight.w700,
+  fontSize: 18,
+);
+
 const kTimelineBlogTitle = TextStyle(
   fontWeight: FontWeight.w700,
 );
