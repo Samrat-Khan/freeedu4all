@@ -1,14 +1,13 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/screens/editProfilePage.dart';
 import 'package:education_community/screens/settingsPage.dart';
 import 'package:education_community/services/countLikeComment.dart';
+import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class MyProfilePage extends StatefulWidget {
   @override
@@ -23,7 +22,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
   @override
   void initState() {
     super.initState();
-    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
+    currentUserId = firebaseAuth.currentUser.uid;
   }
 
   CountLikes _countLikes = CountLikes();

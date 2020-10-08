@@ -2,13 +2,12 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/screens/myProfilePage.dart';
 import 'package:education_community/services/firebase_service_forUpdataData.dart';
 import 'package:education_community/services/photo_picker.dart';
+import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:provider/provider.dart';
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -56,7 +55,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
+    currentUserId = firebaseAuth.currentUser.uid;
   }
 
   Future getUserData() async {

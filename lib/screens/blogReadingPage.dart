@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/services/firebase_service_forUpdataData.dart';
 import 'package:education_community/services/timeCalCulations.dart';
+import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class BlogReadingPage extends StatefulWidget {
   final String blogUID, blogOwnerID;
@@ -28,7 +27,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
+    currentUserId = firebaseAuth.currentUser.uid;
   }
 
   @override

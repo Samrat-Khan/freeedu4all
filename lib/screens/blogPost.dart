@@ -4,6 +4,7 @@ import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
+import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ class _BlogPostState extends State<BlogPost> {
     // TODO: implement initState
     super.initState();
     fieldIsEmpty = true;
-    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
+    currentUserId = firebaseAuth.currentUser.uid;
   }
 
   @override
@@ -272,7 +273,7 @@ class _BlogPostState extends State<BlogPost> {
       timeStamp: timeStamp,
       blogPhotoUrl: blogPhotoUrl,
       blogType: _result,
-      userId: Provider.of<UserProvider>(context, listen: false).user,
+      userId: currentUserId,
     )
         .whenComplete(
       () {

@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
+import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CommentPage extends StatefulWidget {
@@ -25,7 +24,7 @@ class _CommentPageState extends State<CommentPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
+    currentUserId = firebaseAuth.currentUser.uid;
   }
 
   @override

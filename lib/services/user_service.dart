@@ -3,13 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-class UserServiceForGoogleAuth {
-  Future<void> signOutFromGoogle() async {
-    //  Sign Out
-    return null;
-  }
-}
-
 class CheckUserExist {
   Future<bool> checkIfUserAlreadyExist(String uID) async {
     try {
@@ -44,7 +37,7 @@ class EmailAuth {
   }
 
   Future signOut() async {
-    firebaseAuth.signOut();
+    await firebaseAuth.signOut();
   }
 
   Future getCurrentUser() async {

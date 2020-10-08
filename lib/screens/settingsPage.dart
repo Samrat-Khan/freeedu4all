@@ -35,21 +35,13 @@ class _SettingsPageState extends State<SettingsPage> {
     print("About");
   }
 
-  logOut() {
-    _emailAuth.signOut().whenComplete(() {
+  logOut() async {
+    await _emailAuth.signOut().whenComplete(() {
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LogInPage()),
           (route) => false);
     });
-    // googleSignIn.signOut().whenComplete(
-    //   () {
-    //     Navigator.pushAndRemoveUntil(
-    //         context,
-    //         MaterialPageRoute(builder: (BuildContext context) => LogInPage()),
-    //         (route) => false);
-    //   },
-    // );
   }
 
   @override

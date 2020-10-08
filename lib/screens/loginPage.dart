@@ -20,7 +20,6 @@ class _LogInPageState extends State<LogInPage> {
   TextEditingController _password = TextEditingController();
   final GlobalKey<FormState> _formKeyForNewUser = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKeyForExistUser = GlobalKey<FormState>();
-  String email, password;
   bool isEmailValid(email) {
     return RegExp(
             r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
@@ -190,31 +189,6 @@ class _LogInPageState extends State<LogInPage> {
               }
             },
           ),
-          SizedBox(height: 5),
-          Text(
-            "Or",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                child: ClipRRect(
-                  child: Image.asset(
-                    "images/google.png",
-                    width: 30,
-                    height: 30,
-                  ),
-                ),
-                onTap: () {
-                  // callFirebaseGAuth(context);
-                },
-              ),
-            ],
-          ),
           SizedBox(height: 10),
           RichText(
             text: TextSpan(
@@ -342,11 +316,15 @@ class _LogInPageState extends State<LogInPage> {
   CheckUserExist _userExist = CheckUserExist();
   bool _inAsyncCall = false;
   getCurrentUser() async {
+    print("Its comming  ");
     try {
       setState(() {
+        print("SetState is called");
         _inAsyncCall = true;
       });
+      print("call getCurrentUser  ");
       User user = await _emailAuth.getCurrentUser();
+      print("Recived Current User  ");
       if (user == null) {
         setState(() {
           _inAsyncCall = false;
@@ -368,7 +346,7 @@ class _LogInPageState extends State<LogInPage> {
         }
       }
     } catch (e) {
-      print(e);
+      print("An expection occure $e");
     }
   }
 }

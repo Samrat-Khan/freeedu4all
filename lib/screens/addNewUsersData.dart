@@ -33,7 +33,6 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-
     _displayNameTextEditController.dispose();
     _aboutUserTextEditController.dispose();
   }
