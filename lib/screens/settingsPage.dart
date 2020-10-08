@@ -18,7 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
     Icons.logout
   ];
   bool isSwitch = false;
-
+  EmailAuth _emailAuth = EmailAuth();
   changeTheme() {
     setState(() {
       isSwitch = !isSwitch;
@@ -36,14 +36,20 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   logOut() {
-    googleSignIn.signOut().whenComplete(
-      () {
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (BuildContext context) => LogInPage()),
-            (route) => false);
-      },
-    );
+    _emailAuth.signOut().whenComplete(() {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LogInPage()),
+          (route) => false);
+    });
+    // googleSignIn.signOut().whenComplete(
+    //   () {
+    //     Navigator.pushAndRemoveUntil(
+    //         context,
+    //         MaterialPageRoute(builder: (BuildContext context) => LogInPage()),
+    //         (route) => false);
+    //   },
+    // );
   }
 
   @override

@@ -14,8 +14,8 @@ void main() async {
     MultiProvider(
       child: MyApp(),
       providers: [
-        ChangeNotifierProvider(create: (_) => DarkToLightTheme()),
-        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => DarkToLightTheme()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
       ],
     ),
   );

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
-import 'package:education_community/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,38 +16,26 @@ class AddNewUsersData extends StatefulWidget {
 }
 
 class _AddNewUsersDataState extends State<AddNewUsersData> {
-  String _result = "Student";
-  int _radioValue = 0;
   File fileImage;
-  String fullName, displayName, aboutUser;
+  String displayName, aboutUser;
   bool isAllFieldEmpty = true;
   bool isUserEmailEmpty = true;
-  TextEditingController _fullNameTextEditController = TextEditingController();
+
   TextEditingController _displayNameTextEditController =
       TextEditingController();
   TextEditingController _aboutUserTextEditController = TextEditingController();
-
-  void _handleRadioValueChange(int value) {
-    setState(() {
-      _radioValue = value;
-
-      switch (_radioValue) {
-        case 0:
-          _result = "Student";
-
-          break;
-        case 1:
-          _result = "Teacher";
-
-          break;
-      }
-    });
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    _displayNameTextEditController.dispose();
+    _aboutUserTextEditController.dispose();
   }
 
   @override
@@ -67,19 +54,11 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
             SizedBox(
               height: 20,
             ),
-            fullNameTextField(),
-            SizedBox(
-              height: 10,
-            ),
             displayNameTextField(),
             SizedBox(
               height: 10,
             ),
             userFixedEmailField(),
-            SizedBox(
-              height: 10,
-            ),
-            radioButtonChoiceField(),
             SizedBox(
               height: 10,
             ),
@@ -102,8 +81,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
   }
 
   checkTextFieldEmptyOrNot() {
-    if (_fullNameTextEditController.text.isEmpty == true ||
-        _displayNameTextEditController.text.isEmpty == true ||
+    if (_displayNameTextEditController.text.isEmpty == true ||
         fileImage == null) {
       setState(() {
         isAllFieldEmpty = true;
@@ -117,19 +95,16 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
 
   uploadUserDataToFireStore() async {
     FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
-    String userPhotoUrl =
-        await fireBaseService.uploadUserProfilePhotoToFireStorage(
-            fileImage, googleSignIn.currentUser.id);
+    String userPhotoUrl = await fireBaseService
+        .uploadUserProfilePhotoToFireStorage(fileImage, widget.user.uid);
     fireBaseService
         .updateUserDataToFirebase(
-            fullName: fullName,
-            displayName: displayName,
-            aboutUser: aboutUser,
-            userEmail: widget.user.email,
-            photoUrl: userPhotoUrl,
-            userType: _result,
-            uid: widget.user.uid,
-            userID: googleSignIn.currentUser.id)
+      displayName: displayName,
+      aboutUser: aboutUser,
+      userEmail: widget.user.email,
+      photoUrl: userPhotoUrl,
+      uid: widget.user.uid,
+    )
         .whenComplete(() {
       Navigator.of(context).pushNamed(
         "Homepage",
@@ -176,29 +151,6 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
     );
   }
 
-  Container fullNameTextField() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: Colors.black)),
-      child: TextField(
-        textInputAction: TextInputAction.next,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: "John Doe",
-          labelText: "Full Name",
-        ),
-        controller: _fullNameTextEditController,
-        onChanged: (String text) {
-          setState(() {
-            fullName = text;
-          });
-        },
-      ),
-    );
-  }
-
   Container displayNameTextField() {
     return Container(
       padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
@@ -214,9 +166,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         ),
         controller: _displayNameTextEditController,
         onChanged: (String text) {
-          setState(() {
-            displayName = text;
-          });
+          displayName = text;
         },
       ),
     );
@@ -230,32 +180,11 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
           border: Border.all(color: Colors.black)),
       child: TextField(
         decoration: InputDecoration(
-          hintText: googleSignIn.currentUser.email,
+          hintText: widget.user.email,
           border: InputBorder.none,
         ),
         enabled: false,
       ),
-    );
-  }
-
-  Row radioButtonChoiceField() {
-    return Row(
-      children: [
-        Text("I am"),
-        Radio(
-            value: 0,
-            groupValue: _radioValue,
-            onChanged: _handleRadioValueChange),
-        Text("Student"),
-        SizedBox(
-          width: 10,
-        ),
-        Radio(
-            value: 1,
-            groupValue: _radioValue,
-            onChanged: _handleRadioValueChange),
-        Text("Teacher"),
-      ],
     );
   }
 
@@ -276,9 +205,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         ),
         controller: _aboutUserTextEditController,
         onChanged: (String text) {
-          setState(() {
-            aboutUser = text;
-          });
+          aboutUser = text;
         },
       ),
     );

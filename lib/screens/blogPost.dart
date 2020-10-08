@@ -1,13 +1,14 @@
 import 'dart:io';
 
+import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
-import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class BlogPost extends StatefulWidget {
@@ -17,7 +18,7 @@ class BlogPost extends StatefulWidget {
 
 class _BlogPostState extends State<BlogPost> {
   String blogTitle, blogDetail;
-  String blogPhotoUrl;
+  String blogPhotoUrl, currentUserId;
   File imageFile;
   String _result = "Fix";
   int _radioValue = 0;
@@ -29,18 +30,19 @@ class _BlogPostState extends State<BlogPost> {
   bool _inAsyncCall = false;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fieldIsEmpty = true;
+    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
+  }
+
+  @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     _detailTextController.dispose();
     _titleTextController.dispose();
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    fieldIsEmpty = true;
   }
 
   @override
@@ -86,7 +88,6 @@ class _BlogPostState extends State<BlogPost> {
         icon: Icon(Icons.cancel),
         onPressed: () {
           imageFile = null;
-
           Navigator.pop(context);
         },
       ),
@@ -163,9 +164,7 @@ class _BlogPostState extends State<BlogPost> {
         textInputAction: TextInputAction.next,
         controller: _titleTextController,
         onChanged: (String text) {
-          setState(() {
-            blogTitle = text;
-          });
+          blogTitle = text;
         },
       ),
     );
@@ -188,9 +187,7 @@ class _BlogPostState extends State<BlogPost> {
         maxLines: 10,
         controller: _detailTextController,
         onChanged: (String text) {
-          setState(() {
-            blogDetail = text;
-          });
+          blogDetail = text;
         },
       ),
     );
@@ -265,8 +262,8 @@ class _BlogPostState extends State<BlogPost> {
       _inAsyncCall = true;
     });
     FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
-    blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
-        imageFile, googleSignIn.currentUser.id, blogId);
+    blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(imageFile,
+        Provider.of<UserProvider>(context, listen: false).user, blogId);
     fireBaseService
         .updateBlogDataToFirebase(
       blogTitle: blogTitle,
@@ -275,6 +272,7 @@ class _BlogPostState extends State<BlogPost> {
       timeStamp: timeStamp,
       blogPhotoUrl: blogPhotoUrl,
       blogType: _result,
+      userId: Provider.of<UserProvider>(context, listen: false).user,
     )
         .whenComplete(
       () {
@@ -296,7 +294,7 @@ class _BlogPostState extends State<BlogPost> {
     FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
     if (imageFile != null) {
       blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
-          imageFile, googleSignIn.currentUser.id, blogId);
+          imageFile, currentUserId, blogId);
     }
 
     fireBaseService
@@ -307,6 +305,7 @@ class _BlogPostState extends State<BlogPost> {
       blogType: _result,
       blogUid: blogId,
       timeStamp: timeStamp,
+      userId: currentUserId,
     )
         .whenComplete(
       () {

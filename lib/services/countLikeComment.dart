@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/services/user_service.dart';
 
 class CountLikes {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Future countLike() async {
-    String blogOwnerId = googleSignIn.currentUser.id;
+  Future countLike({String blogOwnerId}) async {
     num countTotalLike = 0;
     var getLikes = await firestore
         .collection("Blog")
@@ -14,7 +12,6 @@ class CountLikes {
     for (int i = 0; i < getLikes.docs.length; i++) {
       countTotalLike = getLikes.docs[i].data()["TotalLikes"] + countTotalLike;
     }
-    print("Final Total =  $countTotalLike");
     return countTotalLike;
   }
 }

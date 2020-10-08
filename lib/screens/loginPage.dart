@@ -4,7 +4,6 @@ import 'package:education_community/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:provider/provider.dart';
 
@@ -16,21 +15,12 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
-  @override
-  void initState() {
-    checkIsLoggedIn();
-    _email = TextEditingController();
-    _password = TextEditingController();
-    super.initState();
-  }
-
   bool isLoggedIn = false;
-  TextEditingController _email;
-  TextEditingController _password;
+  TextEditingController _email = TextEditingController();
+  TextEditingController _password = TextEditingController();
   final GlobalKey<FormState> _formKeyForNewUser = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKeyForExistUser = GlobalKey<FormState>();
   String email, password;
-
   bool isEmailValid(email) {
     return RegExp(
             r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
@@ -44,48 +34,10 @@ class _LogInPageState extends State<LogInPage> {
     return regExp.hasMatch(password);
   }
 
-  UserServiceForGoogleAuth userServiceForGoogleAuth =
-      UserServiceForGoogleAuth();
-  UserServiceForEmailAuth userServiceForEmailAuth = UserServiceForEmailAuth();
-
-  checkIsLoggedIn() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    Future.delayed(Duration.zero).then((value) {
-      Provider.of<UserProvider>(context, listen: false)
-          .getUser(auth.currentUser.uid);
-    });
-
-    isLoggedIn = await googleSignIn.isSignedIn();
-    googleSignIn.onCurrentUserChanged.listen((account) {
-      handelSignInAccount(account);
-    }).onError((error) {});
-
-    googleSignIn.signInSilently(suppressErrors: false).then((account) {
-      handelSignInAccount(account);
-    });
-  }
-
-  handelSignInAccount(GoogleSignInAccount account) async {
-    if (account != null) {
-      userServiceForGoogleAuth.signInWithGoogle();
-      setState(() {
-        isLoggedIn = true;
-      });
-    } else {
-      setState(() {
-        isLoggedIn = false;
-      });
-    }
-  }
-
-  signInWithEmailPassword(String email, String password) async {
-    User user = await userServiceForEmailAuth.signInWithEmailAndPassword(
-        email, password);
-  }
-
-  signUpWithEmailPassword(String email, String password) async {
-    User user = await userServiceForEmailAuth.signUpWithEmailAndPassword(
-        email, password);
+  @override
+  void initState() {
+    getCurrentUser();
+    super.initState();
   }
 
   bool crossFadeSwipe = true;
@@ -99,6 +51,14 @@ class _LogInPageState extends State<LogInPage> {
         crossFadeSwipe = false;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _password.dispose();
+    _email.dispose();
   }
 
   @override
@@ -203,12 +163,30 @@ class _LogInPageState extends State<LogInPage> {
               borderRadius: BorderRadius.circular(5),
             ),
             child: Text("log In"),
-            onPressed: () {
+            onPressed: () async {
               if (_formKeyForExistUser.currentState.validate()) {
-                print(_password.text);
-                print(_email.text);
-
-                signInWithEmailPassword(_email.text, _password.text);
+                setState(() {
+                  _inAsyncCall = true;
+                });
+                User user = await _emailAuth.signInWithEmail(
+                    email: _email.text, password: _password.text);
+                bool userExist =
+                    await _userExist.checkIfUserAlreadyExist(user.uid);
+                if (!userExist) {
+                  Navigator.pushNamed(context, "AddNewUserDataPage",
+                      arguments: LoginToNewUser(user));
+                  setState(() {
+                    _inAsyncCall = false;
+                  });
+                } else {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Homepage()),
+                      (route) => false);
+                  setState(() {
+                    _inAsyncCall = false;
+                  });
+                }
               }
             },
           ),
@@ -232,7 +210,7 @@ class _LogInPageState extends State<LogInPage> {
                   ),
                 ),
                 onTap: () {
-                  callFirebaseGAuth(context);
+                  // callFirebaseGAuth(context);
                 },
               ),
             ],
@@ -319,39 +297,21 @@ class _LogInPageState extends State<LogInPage> {
               borderRadius: BorderRadius.circular(5),
             ),
             child: Text("Sign Up"),
-            onPressed: () {
+            onPressed: () async {
+              setState(() {
+                _inAsyncCall = true;
+              });
               if (_formKeyForNewUser.currentState.validate()) {
-                print(_password.text);
-                print(_email.text);
-
-                signInWithEmailPassword(_email.text, _password.text);
+                User user = await _emailAuth.signUpWithEmail(
+                    email: _email.text, password: _password.text);
+                await _emailAuth.verifyEmail();
+                Navigator.pushNamed(context, "AddNewUserDataPage",
+                    arguments: LoginToNewUser(user));
+                setState(() {
+                  _inAsyncCall = false;
+                });
               }
             },
-          ),
-          SizedBox(height: 5),
-          Text(
-            "Or",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 5),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                child: ClipRRect(
-                  child: Image.asset(
-                    "images/google.png",
-                    width: 30,
-                    height: 30,
-                  ),
-                ),
-                onTap: () {
-                  callFirebaseGAuth(context);
-                },
-              ),
-            ],
           ),
           SizedBox(height: 10),
           RichText(
@@ -378,44 +338,37 @@ class _LogInPageState extends State<LogInPage> {
     );
   }
 
-  callFirebaseGAuth(BuildContext context) {
+  EmailAuth _emailAuth = EmailAuth();
+  CheckUserExist _userExist = CheckUserExist();
+  bool _inAsyncCall = false;
+  getCurrentUser() async {
     try {
       setState(() {
         _inAsyncCall = true;
       });
-      UserServiceForGoogleAuth userServiceForGoogleAuth =
-          UserServiceForGoogleAuth();
-      userServiceForGoogleAuth.signInWithGoogle().then((result) async {
-        bool _result = await userServiceForGoogleAuth
-            .checkIfUserAlreadyExist(googleSignIn.currentUser.id);
-
-        if (_result == true) {
-          Navigator.of(context).pushNamed(
-            "Homepage",
-            arguments: Homepage(),
-          );
+      User user = await _emailAuth.getCurrentUser();
+      if (user == null) {
+        setState(() {
+          _inAsyncCall = false;
+        });
+      } else {
+        bool isEmailVerify = await _emailAuth.isEmailVerify();
+        Provider.of<UserProvider>(context, listen: false).getUser(user.uid);
+        if (!isEmailVerify) {
+          await _emailAuth.verifyEmail();
+          Navigator.pushReplacementNamed(context, "Homepage");
           setState(() {
             _inAsyncCall = false;
           });
         } else {
-          Navigator.of(context).pushNamed(
-            "AddNewUserDataPage",
-            arguments: LoginToNewUser(result),
-          );
-
+          Navigator.pushReplacementNamed(context, "Homepage");
           setState(() {
             _inAsyncCall = false;
           });
         }
-      });
+      }
     } catch (e) {
-      print("An Error occurs $e");
-
-      setState(() {
-        _inAsyncCall = false;
-      });
+      print(e);
     }
   }
-
-  bool _inAsyncCall = false;
 }

@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/services/firebase_service_forUpdataData.dart';
 import 'package:education_community/services/timeCalCulations.dart';
-import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BlogReadingPage extends StatefulWidget {
   final String blogUID, blogOwnerID;
@@ -27,7 +28,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentUserId = googleSignIn.currentUser.id;
+    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
   }
 
   @override
@@ -47,7 +48,6 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
 
           _isLiked = ds.data()["Likes"][currentUserId] ??= false;
           min = microToMin.minConvert(ds.data()["TimeStamp"]);
-
           return CustomScrollView(
             slivers: [
               sliverAppBar(ds),
@@ -58,6 +58,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
                     Container(
                       padding: EdgeInsets.all(20),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             ds.data()["BlogTitle"],
@@ -66,7 +67,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
                           SizedBox(height: 15),
                           rowOfLikesAndTime(ds),
                           SizedBox(height: 15),
-                          // rowOfPhotoAndName(),
+                          rowOfPhotoAndName(ds),
                           SizedBox(height: 15),
                           Text(
                             ds.data()["BlogDetail"],
@@ -144,6 +145,25 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
               : ds.data()["TotalLikes"].toString(),
           style: kReadingBlogTimeLike,
         ),
+      ],
+    );
+  }
+
+  rowOfPhotoAndName(ds) {
+    return Row(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(50),
+          child: FadeInImage(
+            height: 30,
+            width: 30,
+            fit: BoxFit.cover,
+            placeholder: AssetImage("images/google.png"),
+            image: NetworkImage(ds.data()["BlogOwnerPhotoUrl"]),
+          ),
+        ),
+        SizedBox(width: 15),
+        Text(ds.data()["BlogOwnerName"]),
       ],
     );
   }

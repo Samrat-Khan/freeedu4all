@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/services/user_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 
@@ -26,25 +25,21 @@ class FirebaseServiceSetData {
     return uploadPhotoLink;
   }
 
-  Future updateUserDataToFirebase(
-      {String fullName,
-      String displayName,
-      String photoUrl,
-      String userEmail,
-      String userType,
-      String aboutUser,
-      String uid,
-      String userID}) async {
+  Future updateUserDataToFirebase({
+    String displayName,
+    String photoUrl,
+    String userEmail,
+    String aboutUser,
+    String uid,
+  }) async {
     CollectionReference userData = firebaseFirestore.collection("Users");
     await userData.doc(uid).set({
-      "Name": fullName,
       "DisplayName": displayName,
       "Email": userEmail,
-      "UserType": userType,
       "About": aboutUser,
       "PhotoUrl": photoUrl,
-      "UserID": userID,
       "UserUID": uid,
+      "Time": currentDateTime.millisecondsSinceEpoch,
     });
   }
 
@@ -65,19 +60,19 @@ class FirebaseServiceSetData {
     String blogUid,
     String blogType,
     String blogDetail,
+    String userId,
     int timeStamp,
   }) async {
     String month = monthFormat.getMonth(currentDateTime.month);
 
-    DocumentSnapshot variable = await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(currentUser.uid)
-        .get();
+    DocumentSnapshot variable =
+        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
     CollectionReference blogData = firebaseFirestore.collection("Blog");
 
     await blogData.doc(blogUid).set({
-      "BlogOwnerId": currentUser.uid,
+      "BlogOwnerId": userId,
       "BlogOwnerName": variable.data()["DisplayName"],
+      "BlogOwnerPhotoUrl": variable.data()["PhotoUrl"],
       "BlogTitle": blogTitle,
       "BlogDetail": blogDetail,
       "BlogType": blogType,
@@ -104,12 +99,13 @@ class FirebaseServiceSetData {
     String blogUid,
     String blogType,
     String blogDetail,
+    String userId,
     int timeStamp,
   }) async {
     String month = monthFormat.getMonth(currentDateTime.month);
     CollectionReference draftBlog = firebaseFirestore.collection("DraftBlog");
     await draftBlog.doc(blogUid).set({
-      "BlogOwnerId": currentUser.uid,
+      "BlogOwnerId": userId,
       "BlogTitle": blogTitle,
       "BlogDetail": blogDetail,
       "BlogType": blogType,
@@ -123,7 +119,7 @@ class FirebaseServiceSetData {
   Future addCommentToBlog({
     String comment,
     String blogUID,
-    String commentPersonId,
+    String userId,
   }) async {
     String commentID;
     Uuid uuid = Uuid();
@@ -131,10 +127,14 @@ class FirebaseServiceSetData {
     int timeStamp = currentDateTime.microsecondsSinceEpoch;
     String month = monthFormat.getMonth(currentDateTime.month);
     CollectionReference addComment = firebaseFirestore.collection("Comments");
+    DocumentSnapshot variable =
+        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
     await addComment.doc(commentID).set({
+      "CommentUserName": variable.data()["DisplayName"],
+      "CommentUserPhoto": variable.data()["PhotoUrl"],
       "Comment": comment,
       "BlogUID": blogUID,
-      "CommentPersonID": commentPersonId,
+      "CommentPersonID": userId,
       "CommentID": commentID,
       "TimeStamp": timeStamp,
       "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",

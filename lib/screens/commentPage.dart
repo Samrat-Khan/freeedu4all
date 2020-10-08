@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
-import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class CommentPage extends StatefulWidget {
@@ -13,8 +14,20 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   String commentID = Uuid().v1();
-  String commentText, commentedUserName, commentedUseID, commentedUserPhotoUrl;
+  String commentText,
+      commentedUserName,
+      commentedUseID,
+      commentedUserPhotoUrl,
+      currentUserId;
   TextEditingController _commentEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -62,28 +75,27 @@ class _CommentPageState extends State<CommentPage> {
             itemBuilder: (context, index) {
               DocumentSnapshot ds = snapshot.data.documents[index];
               return Container(
-                child: FutureBuilder(
-                  future: getUserData(ds.data()["CommentPersonID"]),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Text("Comment Loading....");
-                    }
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(commentedUserPhotoUrl),
-                      ),
-                      title: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: ListTile(
-                          title: Text(commentedUserName),
-                          subtitle: Text(ds.data()["Comment"]),
-                          isThreeLine: true,
-                        ),
-                      ),
-                    );
-                  },
+                child: ListTile(
+                  leading: ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: FadeInImage(
+                      height: 30,
+                      width: 30,
+                      fit: BoxFit.cover,
+                      placeholder: AssetImage("images/google.png"),
+                      image: NetworkImage(ds.data()["CommentUserPhoto"]),
+                    ),
+                  ),
+                  title: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: ListTile(
+                      title: Text(ds.data()["CommentUserName"]),
+                      subtitle: Text(ds.data()["Comment"]),
+                      isThreeLine: true,
+                    ),
+                  ),
                 ),
               );
             },
@@ -91,14 +103,6 @@ class _CommentPageState extends State<CommentPage> {
         },
       ),
     );
-  }
-
-  Future getUserData(String userID) async {
-    DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection("Users").doc(userID).get();
-    commentedUserName = snapshot.data()["DisplayName"];
-    commentedUseID = snapshot.data()["UserID"];
-    commentedUserPhotoUrl = snapshot.data()["PhotoUrl"];
   }
 
   BottomAppBar callCommentTextField() {
@@ -155,8 +159,8 @@ class _CommentPageState extends State<CommentPage> {
     FirebaseServiceSetData firebaseServiceSetData = FirebaseServiceSetData();
     firebaseServiceSetData
         .addCommentToBlog(
+      userId: currentUserId,
       comment: commentText,
-      commentPersonId: googleSignIn.currentUser.id,
       blogUID: widget.blogUID,
     )
         .whenComplete(() {

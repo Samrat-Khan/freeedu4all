@@ -1,12 +1,14 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/screens/editProfilePage.dart';
 import 'package:education_community/screens/settingsPage.dart';
 import 'package:education_community/services/countLikeComment.dart';
-import 'package:education_community/services/user_service.dart';
-import 'package:education_community/widgets/loadingWidget.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyProfilePage extends StatefulWidget {
   @override
@@ -14,33 +16,26 @@ class MyProfilePage extends StatefulWidget {
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
-  String currentUserDisplayName, currentUserPhotoUrl;
+  String currentUserDisplayName, currentUserPhotoUrl, currentUserId;
   int countTotalPost, countTotalLikes, countTotalComment;
   List _tab = ["Publish", "Draft"];
   TabController _tabController;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    currentUserId = Provider.of<UserProvider>(context, listen: false).user;
   }
 
   CountLikes _countLikes = CountLikes();
   CountComments _comments = CountComments();
   Future getCurrentUserData() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(googleSignIn.currentUser.id)
-        .get();
-    currentUserDisplayName = snapshot.data()["DisplayName"];
-    currentUserPhotoUrl = snapshot.data()["PhotoUrl"];
-
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    var getPost = await firestore
+    var getLike = await firestore
         .collection("Blog")
-        .where("BlogOwnerId", isEqualTo: googleSignIn.currentUser.id)
+        .where("BlogOwnerId", isEqualTo: currentUserId)
         .get();
-    countTotalPost = getPost.docs.length;
-    countTotalLikes = await _countLikes.countLike();
+    countTotalPost = getLike.docs.length;
+    countTotalLikes = await _countLikes.countLike(blogOwnerId: currentUserId);
   }
 
   @override
@@ -49,18 +44,41 @@ class _MyProfilePageState extends State<MyProfilePage> {
       length: _tab.length,
       initialIndex: 0,
       child: SafeArea(
-        child: Scaffold(
-          appBar: currentUserAppBarData(),
-          body: TabBarView(
-            controller: _tabController,
-            children: [currentUserPublishedPost(), currentUserDraftPost()],
-          ),
-        ),
+        child: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection("Users")
+                .doc(currentUserId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Scaffold(
+                  body: Text("Text......"),
+                );
+              }
+              DocumentSnapshot ds = snapshot.data;
+
+              return Scaffold(
+                appBar: currentUserAppBarData(
+                  userPhotoUrl: ds.data()["PhotoUrl"],
+                  userDisplayName: ds.data()["DisplayName"],
+                ),
+                body: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    currentUserPublishedPost(),
+                    currentUserDraftPost()
+                  ],
+                ),
+              );
+            }),
       ),
     );
   }
 
-  PreferredSize currentUserAppBarData() {
+  PreferredSize currentUserAppBarData(
+      {String userPhotoUrl, String userDisplayName}) {
+    // print("Calling Photo URL ${ds.data()["PhotoUrl"]}");
+    // print("Calling Display Name ${ds.data()["DisplayName"]}");
     return PreferredSize(
       preferredSize: Size.fromHeight(210),
       child: AppBar(
@@ -86,72 +104,71 @@ class _MyProfilePageState extends State<MyProfilePage> {
             },
           ),
         ],
-        flexibleSpace: FutureBuilder(
-          future: getCurrentUserData(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: LoadingWidget());
-            }
-            return Padding(
-              padding: EdgeInsets.only(top: 40),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundImage: NetworkImage(currentUserPhotoUrl),
-                        ),
-                        SizedBox(height: 10),
-                        Text(currentUserDisplayName),
-                      ],
+        flexibleSpace: Padding(
+          padding: EdgeInsets.only(top: 40),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Colors.limeAccent,
+                      backgroundImage: userPhotoUrl != null
+                          ? NetworkImage(userPhotoUrl)
+                          : AssetImage("images/google.png"),
                     ),
-                  ),
-                  Container(
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text("Posts"),
-                            SizedBox(width: 25),
-                            Text("Likes"),
-                          ],
-                        ),
-                        SizedBox(height: 15),
-                        Row(
-                          children: [
-                            Text(countTotalPost.toString()),
-                            SizedBox(width: 25),
-                            Text(countTotalLikes.toString()),
-                          ],
-                        ),
-                        SizedBox(height: 15),
-                        OutlineButton.icon(
-                          label: Text("Edit Profile"),
-                          icon: Icon(
-                            Icons.edit,
-                            size: 15,
-                          ),
-                          color: Colors.green,
-                          onPressed: () {
-                            Navigator.pushNamed(
-                              context,
-                              "EditProfilePage",
-                              arguments: EditProfilePage(),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                    SizedBox(height: 10),
+                    Text(userDisplayName),
+                  ],
+                ),
               ),
-            );
-          },
+              Container(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text("Posts"),
+                        SizedBox(width: 25),
+                        Text("Likes"),
+                      ],
+                    ),
+                    SizedBox(height: 15),
+                    FutureBuilder(
+                        future: getCurrentUserData(),
+                        builder: (context, snapshot) {
+                          return Row(
+                            children: [
+                              Text(countTotalPost.toString()),
+                              SizedBox(width: 25),
+                              Text(countTotalLikes.toString()),
+                            ],
+                          );
+                        }),
+                    SizedBox(height: 15),
+                    OutlineButton.icon(
+                      label: Text("Edit Profile"),
+                      icon: Icon(
+                        Icons.edit,
+                        size: 15,
+                      ),
+                      color: Colors.green,
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          "EditProfilePage",
+                          arguments: EditProfilePage(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -164,7 +181,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
       child: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection("Blog")
-            .where("BlogOwnerId", isEqualTo: googleSignIn.currentUser.id)
+            .where("BlogOwnerId", isEqualTo: currentUserId)
             .orderBy("TimeStamp", descending: true)
             .snapshots(),
         builder: (context, snapshot) {
@@ -207,6 +224,27 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             overflow: TextOverflow.fade,
                           ),
                         ),
+                        Container(
+                          height: _height / 18,
+                          width: _width,
+                          padding: EdgeInsets.only(top: 5, left: 10),
+                          child: Row(
+                            children: [
+                              Icon(Icons.thumb_up),
+                              Text("10"),
+                              SizedBox(width: 20),
+                              Icon(Icons.comment),
+                              Text("10"),
+                              Spacer(),
+                              IconButton(
+                                  icon: Icon(Icons.edit_rounded),
+                                  onPressed: null),
+                              IconButton(
+                                  icon: Icon(Icons.delete_forever),
+                                  onPressed: null),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -223,7 +261,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
         child: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection("DraftBlog")
-              .where("BlogOwnerId", isEqualTo: googleSignIn.currentUser.id)
+              .where("BlogOwnerId", isEqualTo: currentUserId)
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
@@ -245,7 +283,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            height: _height / 4,
+                            height: _height / 8,
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: ds.data()["BlogPhotoUrl"] == null
@@ -269,8 +307,21 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           Container(
                             height: _height / 18,
                             padding: EdgeInsets.only(top: 5, left: 10),
-                            child: Text(
-                              ds.data()["DateTime"],
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  ds.data()["DateTime"],
+                                ),
+                                Spacer(),
+                                IconButton(
+                                    icon: Icon(Icons.edit_rounded),
+                                    onPressed: null),
+                                IconButton(
+                                    icon: Icon(Icons.delete_forever),
+                                    onPressed: null),
+                              ],
                             ),
                           ),
                         ],
