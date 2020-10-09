@@ -19,13 +19,12 @@ class BlogReadingPage extends StatefulWidget {
 }
 
 class _BlogReadingPageState extends State<BlogReadingPage> {
-  bool _isLiked;
+  bool _isLiked, _isBookmarkChecked;
   int countLike = 0, min;
   String currentUserId;
   MicroToMin microToMin = MicroToMin();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     currentUserId = firebaseAuth.currentUser.uid;
   }
@@ -47,6 +46,8 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
 
           _isLiked = ds.data()["Likes"][currentUserId] ??= false;
           min = microToMin.minConvert(ds.data()["TimeStamp"]);
+          _isBookmarkChecked = ds.data()["Bookmark"][currentUserId] ??= false;
+
           return CustomScrollView(
             slivers: [
               sliverAppBar(ds),
@@ -115,6 +116,29 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
     }
   }
 
+  Future handelBookmark(DocumentSnapshot ds) async {
+    _isBookmarkChecked = ds.data()["Bookmark"][currentUserId] == true;
+    if (_isBookmarkChecked) {
+      setState(() {
+        _isBookmarkChecked = false;
+      });
+      await _firebaseServiceUpdateData.handelBookmark(
+        blogUid: widget.blogUID,
+        isBookmarkChecked: _isBookmarkChecked,
+        currentUserID: currentUserId,
+      );
+    } else {
+      setState(() {
+        _isBookmarkChecked = true;
+      });
+      await _firebaseServiceUpdateData.handelBookmark(
+        blogUid: widget.blogUID,
+        isBookmarkChecked: _isBookmarkChecked,
+        currentUserID: currentUserId,
+      );
+    }
+  }
+
   rowOfLikesAndTime(ds) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -131,9 +155,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
         ),
         SizedBox(width: 50),
         IconButton(
-            icon: _isLiked
-                ? Icon(Icons.thumb_up)
-                : Icon(Icons.thumb_up_alt_outlined),
+            icon: _isLiked ? kFillHeartIcon : kHeartIcon,
             onPressed: () async {
               await handelLike(ds);
             }),
@@ -179,7 +201,13 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
       pinned: false,
       floating: true,
       actions: [
-        IconButton(icon: Icon(Icons.bookmark), onPressed: null),
+        IconButton(
+            icon: Icon(_isBookmarkChecked
+                ? Icons.bookmark_rounded
+                : Icons.bookmark_outline_rounded),
+            onPressed: () {
+              handelBookmark(ds);
+            }),
       ],
       flexibleSpace: Stack(
         children: [

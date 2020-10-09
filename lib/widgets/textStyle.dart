@@ -46,3 +46,11 @@ const kCurrentUserBlogTitle = TextStyle(
   fontWeight: FontWeight.w800,
   fontSize: 18,
 );
+
+const kHeartIcon = Icon(
+  Icons.favorite_border,
+);
+const kFillHeartIcon = Icon(
+  Icons.favorite,
+  color: Colors.red,
+);

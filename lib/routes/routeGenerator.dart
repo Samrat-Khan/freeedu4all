@@ -3,6 +3,8 @@ import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/screens/addNewUsersData.dart';
 import 'package:education_community/screens/blogPost.dart';
 import 'package:education_community/screens/blogReadingPage.dart';
+import 'package:education_community/screens/bookmarkPage.dart';
+import 'package:education_community/screens/bottomAppBar.dart';
 import 'package:education_community/screens/commentPage.dart';
 import 'package:education_community/screens/editProfilePage.dart';
 import 'package:education_community/screens/loginPage.dart';
@@ -50,6 +52,11 @@ class RouteGenerator {
 
       case "EditProfilePage":
         return MaterialPageRoute(builder: (context) => EditProfilePage());
+      case "BookmarkPage":
+        return MaterialPageRoute(builder: (context) => BookMarkPage());
+      case "BottomAppBar":
+        return MaterialPageRoute(
+            builder: (context) => BottomNavigationAppBar());
       default:
         return _errorPage(settings.name);
     }

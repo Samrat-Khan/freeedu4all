@@ -99,4 +99,13 @@ class FirebaseServiceUpdateData {
     uploadPhotoLink = await storageReference.getDownloadURL();
     return uploadPhotoLink;
   }
+
+  Future handelBookmark(
+      {String blogUid, String currentUserID, bool isBookmarkChecked}) async {
+    await firebaseFirestore.collection("Blog").doc(blogUid).update(
+      {
+        'Bookmark.$currentUserID': isBookmarkChecked,
+      },
+    );
+  }
 }

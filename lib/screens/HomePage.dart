@@ -25,25 +25,6 @@ class _HomepageState extends State<Homepage> {
             "Edu Community",
             style: kAppTitle,
           ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.account_circle_rounded),
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  "MyProfilePage",
-                );
-              },
-            ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          onPressed: () {
-            Navigator.of(context).pushNamed(
-              "BlogPostPage",
-            );
-          },
         ),
         body: StreamBuilder(
           stream: FirebaseFirestore.instance

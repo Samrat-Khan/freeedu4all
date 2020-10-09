@@ -1,5 +1,6 @@
 import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/routes/routeDataPass.dart';
+import 'package:education_community/screens/bottomAppBar.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -180,7 +181,8 @@ class _LogInPageState extends State<LogInPage> {
                 } else {
                   Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => Homepage()),
+                      MaterialPageRoute(
+                          builder: (context) => BottomNavigationAppBar()),
                       (route) => false);
                   setState(() {
                     _inAsyncCall = false;
@@ -316,15 +318,13 @@ class _LogInPageState extends State<LogInPage> {
   CheckUserExist _userExist = CheckUserExist();
   bool _inAsyncCall = false;
   getCurrentUser() async {
-    print("Its comming  ");
     try {
       setState(() {
-        print("SetState is called");
         _inAsyncCall = true;
       });
-      print("call getCurrentUser  ");
+
       User user = await _emailAuth.getCurrentUser();
-      print("Recived Current User  ");
+
       if (user == null) {
         setState(() {
           _inAsyncCall = false;
@@ -334,19 +334,17 @@ class _LogInPageState extends State<LogInPage> {
         Provider.of<UserProvider>(context, listen: false).getUser(user.uid);
         if (!isEmailVerify) {
           await _emailAuth.verifyEmail();
-          Navigator.pushReplacementNamed(context, "Homepage");
+          Navigator.pushReplacementNamed(context, "BottomAppBar");
           setState(() {
             _inAsyncCall = false;
           });
         } else {
-          Navigator.pushReplacementNamed(context, "Homepage");
+          Navigator.pushReplacementNamed(context, "BottomAppBar");
           setState(() {
             _inAsyncCall = false;
           });
         }
       }
-    } catch (e) {
-      print("An expection occure $e");
-    }
+    } catch (e) {}
   }
 }

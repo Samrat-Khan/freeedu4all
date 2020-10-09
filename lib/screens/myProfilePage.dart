@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/screens/editProfilePage.dart';
-import 'package:education_community/screens/settingsPage.dart';
 import 'package:education_community/services/countLikeComment.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
@@ -81,6 +80,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     return PreferredSize(
       preferredSize: Size.fromHeight(210),
       child: AppBar(
+        automaticallyImplyLeading: false,
         bottom: TabBar(
           tabs: [
             Tab(
@@ -91,18 +91,6 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                "SettingsPage",
-                arguments: SettingsPage(),
-              );
-            },
-          ),
-        ],
         flexibleSpace: Padding(
           padding: EdgeInsets.only(top: 40),
           child: Row(

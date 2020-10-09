@@ -5,6 +5,7 @@ import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class AddNewUsersData extends StatefulWidget {
   final User user;
@@ -37,37 +38,41 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
     _aboutUserTextEditController.dispose();
   }
 
+  bool _inAsyncCall = false;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Update Bio"),
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          children: [
-            photoChooseContainer(),
-            SizedBox(
-              height: 20,
-            ),
-            displayNameTextField(),
-            SizedBox(
-              height: 10,
-            ),
-            userFixedEmailField(),
-            SizedBox(
-              height: 10,
-            ),
-            aboutUserTextField(),
-            MaterialButton(
-              color: Colors.green,
-              child: Text("Submit"),
-              onPressed: uploadUserDataToFireStore,
-            ),
-          ],
+    return ModalProgressHUD(
+      inAsyncCall: _inAsyncCall,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Update Bio"),
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(15),
+          child: Column(
+            children: [
+              photoChooseContainer(),
+              SizedBox(
+                height: 20,
+              ),
+              displayNameTextField(),
+              SizedBox(
+                height: 10,
+              ),
+              userFixedEmailField(),
+              SizedBox(
+                height: 10,
+              ),
+              aboutUserTextField(),
+              MaterialButton(
+                color: Colors.green,
+                child: Text("Submit"),
+                onPressed: uploadUserDataToFireStore,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -93,6 +98,9 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
   }
 
   uploadUserDataToFireStore() async {
+    setState(() {
+      _inAsyncCall = true;
+    });
     FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
     String userPhotoUrl = await fireBaseService
         .uploadUserProfilePhotoToFireStorage(fileImage, widget.user.uid);
@@ -109,6 +117,9 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         "Homepage",
         arguments: Homepage(),
       );
+      setState(() {
+        _inAsyncCall = false;
+      });
     });
   }
 
