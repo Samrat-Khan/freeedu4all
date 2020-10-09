@@ -82,6 +82,7 @@ class FirebaseServiceSetData {
       "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
       "TotalLikes": 0,
       "Likes": {},
+      "Bookmark": {},
     });
   }
 

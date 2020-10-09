@@ -146,7 +146,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
         Icon(Icons.access_time_sharp),
         SizedBox(width: 5),
         Text(
-          min > 0 && min <= 60
+          min >= 0 && min <= 60
               ? "$min min"
               : (min ~/ 60) > 24
                   ? ds.data()["DateTime"]
