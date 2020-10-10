@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:education_community/providerServices/authUserProvider.dart';
-import 'package:education_community/screens/HomePage.dart';
+import 'package:education_community/screens/bottomAppBar.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/services/user_service.dart';
@@ -278,7 +278,7 @@ class _BlogPostState extends State<BlogPost> {
         .whenComplete(
       () {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => Homepage()),
+            MaterialPageRoute(builder: (context) => BottomNavigationAppBar()),
             (route) => false);
       },
     );
@@ -311,7 +311,7 @@ class _BlogPostState extends State<BlogPost> {
         .whenComplete(
       () {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => Homepage()),
+            MaterialPageRoute(builder: (context) => BottomNavigationAppBar()),
             (route) => false);
       },
     );

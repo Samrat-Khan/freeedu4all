@@ -206,7 +206,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
           border: Border.all(color: Colors.black)),
       child: TextField(
         maxLines: 5,
-        maxLength: 180,
+        maxLength: 110,
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
           hintText: "Max 5 Lines",

@@ -1,7 +1,5 @@
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/screens/editProfilePage.dart';
+import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/services/countLikeComment.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
@@ -14,311 +12,234 @@ class MyProfilePage extends StatefulWidget {
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
-  String currentUserDisplayName, currentUserPhotoUrl, currentUserId;
+  String currentUserDisplayName,
+      currentUserPhotoUrl,
+      currentUserId,
+      currentUserBio,
+      currentUserEmail;
   int countTotalPost, countTotalLikes, countTotalComment;
-  List _tab = ["Publish", "Draft"];
-  TabController _tabController;
   @override
   void initState() {
     super.initState();
     currentUserId = firebaseAuth.currentUser.uid;
   }
 
-  CountLikes _countLikes = CountLikes();
-  CountComments _comments = CountComments();
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  CountLikes _likes = CountLikes();
   Future getCurrentUserData() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    var getLike = await firestore
+    var getUserData =
+        await firestore.collection("Users").doc(currentUserId).get();
+    var getTotalPost = await firestore
         .collection("Blog")
         .where("BlogOwnerId", isEqualTo: currentUserId)
         .get();
-    countTotalPost = getLike.docs.length;
-    countTotalLikes = await _countLikes.countLike(blogOwnerId: currentUserId);
+    countTotalLikes = await _likes.countLike(blogOwnerId: currentUserId);
+    countTotalPost = getTotalPost.docs.length;
+    currentUserDisplayName = getUserData.data()["DisplayName"];
+    currentUserPhotoUrl = getUserData.data()["PhotoUrl"];
+    currentUserBio = getUserData.data()["About"];
+    currentUserEmail = getUserData.data()["Email"];
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: _tab.length,
-      initialIndex: 0,
-      child: SafeArea(
-        child: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection("Users")
-                .doc(currentUserId)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Scaffold(
-                  body: Text("Text......"),
-                );
-              }
-              DocumentSnapshot ds = snapshot.data;
-
-              return Scaffold(
-                appBar: currentUserAppBarData(
-                  userPhotoUrl: ds.data()["PhotoUrl"],
-                  userDisplayName: ds.data()["DisplayName"],
-                ),
-                body: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    currentUserPublishedPost(),
-                    currentUserDraftPost()
-                  ],
-                ),
-              );
-            }),
-      ),
-    );
-  }
-
-  PreferredSize currentUserAppBarData(
-      {String userPhotoUrl, String userDisplayName}) {
-    // print("Calling Photo URL ${ds.data()["PhotoUrl"]}");
-    // print("Calling Display Name ${ds.data()["DisplayName"]}");
-    return PreferredSize(
-      preferredSize: Size.fromHeight(210),
-      child: AppBar(
-        automaticallyImplyLeading: false,
-        bottom: TabBar(
-          tabs: [
-            Tab(
-              child: Text("Published"),
-            ),
-            Tab(
-              child: Text("Draft"),
-            ),
-          ],
-        ),
-        flexibleSpace: Padding(
-          padding: EdgeInsets.only(top: 40),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 36,
-                      backgroundColor: Colors.limeAccent,
-                      backgroundImage: userPhotoUrl != null
-                          ? NetworkImage(userPhotoUrl)
-                          : AssetImage("images/google.png"),
-                    ),
-                    SizedBox(height: 10),
-                    Text(userDisplayName),
-                  ],
-                ),
-              ),
-              Container(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text("Posts"),
-                        SizedBox(width: 25),
-                        Text("Likes"),
-                      ],
-                    ),
-                    SizedBox(height: 15),
-                    FutureBuilder(
-                        future: getCurrentUserData(),
-                        builder: (context, snapshot) {
-                          return Row(
-                            children: [
-                              Text(countTotalPost.toString()),
-                              SizedBox(width: 25),
-                              Text(countTotalLikes.toString()),
-                            ],
-                          );
-                        }),
-                    SizedBox(height: 15),
-                    OutlineButton.icon(
-                      label: Text("Edit Profile"),
-                      icon: Icon(
-                        Icons.edit,
-                        size: 15,
-                      ),
-                      color: Colors.green,
-                      onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          "EditProfilePage",
-                          arguments: EditProfilePage(),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Container currentUserPublishedPost() {
-    var _height = MediaQuery.of(context).size.height;
-    var _width = MediaQuery.of(context).size.width;
-    return Container(
+    return SafeArea(
       child: StreamBuilder(
-        stream: FirebaseFirestore.instance
-            .collection("Blog")
-            .where("BlogOwnerId", isEqualTo: currentUserId)
-            .orderBy("TimeStamp", descending: true)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: Text("No Data",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-            );
-          }
-          return ListView.builder(
-            itemCount: snapshot.data.documents.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot ds = snapshot.data.documents[index];
-
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Card(
-                  child: Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: _width,
-                          height: _height / 6,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            image: DecorationImage(
-                              image: NetworkImage(ds.data()["BlogPhotoUrl"]),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: _width,
-                          height: _height / 15,
-                          padding: EdgeInsets.only(top: 5, left: 10),
-                          child: Text(
-                            ds.data()["BlogTitle"],
-                            style: kCurrentUserBlogTitle,
-                            overflow: TextOverflow.fade,
-                          ),
-                        ),
-                        Container(
-                          height: _height / 18,
-                          width: _width,
-                          padding: EdgeInsets.only(top: 5, left: 10),
-                          child: Row(
-                            children: [
-                              Icon(Icons.thumb_up),
-                              Text("10"),
-                              SizedBox(width: 20),
-                              Icon(Icons.comment),
-                              Text("10"),
-                              Spacer(),
-                              IconButton(
-                                  icon: Icon(Icons.edit_rounded),
-                                  onPressed: null),
-                              IconButton(
-                                  icon: Icon(Icons.delete_forever),
-                                  onPressed: null),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-
-  Container currentUserDraftPost() => Container(
-        child: StreamBuilder(
           stream: FirebaseFirestore.instance
-              .collection("DraftBlog")
+              .collection("Blog")
               .where("BlogOwnerId", isEqualTo: currentUserId)
+              .orderBy("TimeStamp", descending: true)
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Center(
-                child: Text("Loading....."),
+              return Scaffold(
+                body: Center(
+                  child: LinearProgressIndicator(),
+                ),
               );
             }
-            return ListView.builder(
-              itemCount: snapshot.data.documents.length,
-              itemBuilder: (context, index) {
-                DocumentSnapshot ds = snapshot.data.documents[index];
-                var _height = MediaQuery.of(context).size.height;
-                // var _width = MediaQuery.of(context).size.width;
-                return Padding(
-                  padding: EdgeInsets.all(15),
-                  child: Card(
-                    child: Container(
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                body: Center(
+                  child: LinearProgressIndicator(),
+                ),
+              );
+            }
+            return Scaffold(
+              body: CustomScrollView(
+                slivers: [
+                  sliverAppBarForUserData(),
+                  sliverListForPublishedPost(snapshot),
+                ],
+              ),
+            );
+          }),
+    );
+  }
+
+  SliverAppBar sliverAppBarForUserData() {
+    return SliverAppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      expandedHeight: 200,
+      centerTitle: true,
+      collapsedHeight: 160,
+      pinned: true,
+      floating: true,
+      flexibleSpace: FutureBuilder(
+          future: getCurrentUserData(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Card(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.height / 8,
+                          width: MediaQuery.of(context).size.width / 4,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: FadeInImage(
+                              fit: BoxFit.cover,
+                              placeholder: AssetImage("images/google.png"),
+                              image: NetworkImage(currentUserPhotoUrl),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        Text(
+                          currentUserDisplayName,
+                          style: kProfileUserName,
+                        ),
+                      ],
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width / 2,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            height: _height / 8,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: ds.data()["BlogPhotoUrl"] == null
-                                    ? AssetImage("images/loading.gif")
-                                    : NetworkImage(ds.data()["BlogPhotoUrl"]),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: _height / 15,
-                            padding: EdgeInsets.only(top: 5, left: 10),
                             child: Text(
-                              ds.data()["BlogTitle"] == null
-                                  ? "You Didn't Specify Title Yet "
-                                  : ds.data()["BlogTitle"],
-                              style: kCurrentUserBlogTitle,
-                              overflow: TextOverflow.fade,
+                              currentUserBio,
+                              style: kCurrentUserBio,
                             ),
                           ),
-                          Container(
-                            height: _height / 18,
-                            padding: EdgeInsets.only(top: 5, left: 10),
+                          Divider(
+                            thickness: 2,
+                            color: Colors.black,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(2.0),
                             child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Text(
-                                  ds.data()["DateTime"],
+                                  "$countTotalPost Post",
+                                  style: kLikePostStyle,
                                 ),
-                                Spacer(),
-                                IconButton(
-                                    icon: Icon(Icons.edit_rounded),
-                                    onPressed: null),
-                                IconButton(
-                                    icon: Icon(Icons.delete_forever),
-                                    onPressed: null),
+                                SizedBox(width: 20),
+                                Text(
+                                  "$countTotalLikes Like",
+                                  style: kLikePostStyle,
+                                ),
                               ],
                             ),
                           ),
                         ],
                       ),
                     ),
+                  ],
+                ),
+              ),
+            );
+          }),
+    );
+  }
+
+  SliverList sliverListForPublishedPost(AsyncSnapshot snapshot) {
+    return SliverList(
+      delegate: SliverChildListDelegate(
+        List.generate(
+          snapshot.data.documents.length,
+          (index) {
+            DocumentSnapshot ds = snapshot.data.documents[index];
+
+            return Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: FadeInImage(
+                      fit: BoxFit.cover,
+                      placeholder: AssetImage("images/1.webp"),
+                      image: NetworkImage(ds.data()["BlogPhotoUrl"]),
+                    ),
                   ),
-                );
-              },
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    child: Text(
+                      ds.data()["BlogTitle"],
+                      style: kCurrentUserBlogTitle,
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        child: Row(
+                          children: [
+                            kFillHeartIcon,
+                            SizedBox(width: 5),
+                            Text(ds.data()["TotalLikes"].toString()),
+                            SizedBox(width: 20),
+                            IconButton(
+                                icon: kCommentIcon,
+                                onPressed: () {
+                                  Navigator.pushNamed(context, "CommentPage",
+                                      arguments: BlogReadToComment(
+                                          blogUID: ds.data()["BlogUid"]));
+                                }),
+                          ],
+                        ),
+                      ),
+                      PopupMenuButton(itemBuilder: (context) {
+                        return {"Edit", "Delete"}.map((String choice) {
+                          return PopupMenuItem(
+                            child: Text(choice),
+                            value: choice,
+                          );
+                        }).toList();
+                      }),
+                    ],
+                  ),
+                ],
+              ),
             );
           },
         ),
-      );
+      ),
+    );
+  }
+
+  handelSelect() {}
 }

@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/screens/myProfilePage.dart';
 import 'package:education_community/services/firebase_service_forUpdataData.dart';
 import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/services/user_service.dart';
@@ -43,10 +42,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         .whenComplete(() {
       setState(() {
         isUploading = false;
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MyProfilePage()),
-            (route) => false);
+        Navigator.pop(context);
       });
     });
   }

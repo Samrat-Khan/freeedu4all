@@ -4,14 +4,23 @@ import 'package:education_community/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'editProfilePage.dart';
+
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  List _settingsOptionsName = ["Change Theme", "Privacy", "About", "SignOut"];
+  List _settingsOptionsName = [
+    "Edit Profile",
+    "Change Theme",
+    "Privacy",
+    "About",
+    "SignOut"
+  ];
   List<IconData> _settingsOptionsIcon = [
+    Icons.edit_rounded,
     Icons.wb_sunny,
     Icons.privacy_tip_sharp,
     Icons.info,
@@ -44,6 +53,14 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
+  editProfile() {
+    Navigator.pushNamed(
+      context,
+      "EditProfilePage",
+      arguments: EditProfilePage(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var themeProvider = Provider.of<DarkToLightTheme>(context);
@@ -57,7 +74,7 @@ class _SettingsPageState extends State<SettingsPage> {
         body: ListView.separated(
             itemBuilder: (context, index) {
               return ListTile(
-                leading: index != 0
+                leading: index != 1
                     ? Icon(_settingsOptionsIcon[index])
                     : Icon(themeProvider.isDark
                         ? Icons.nightlight_round
@@ -67,17 +84,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 onTap: () {
                   switch (index) {
                     case 0:
-                      changeTheme();
-                      break;
+                      return editProfile();
                     case 1:
-                      readPrivacy();
-                      break;
+                      return changeTheme();
+
                     case 2:
-                      readAbout();
-                      break;
+                      return readPrivacy();
                     case 3:
-                      logOut();
-                      break;
+                      return readAbout();
+
+                    case 4:
+                      return logOut();
                   }
                 },
               );

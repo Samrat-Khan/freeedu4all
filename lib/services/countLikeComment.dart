@@ -18,7 +18,7 @@ class CountLikes {
 
 class CountComments {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  Future<int> countComment(String blogUID) async {
+  Future countComment(String blogUID) async {
     var getComments = await firestore
         .collection("Comments")
         .where("BlogUID", isEqualTo: blogUID)

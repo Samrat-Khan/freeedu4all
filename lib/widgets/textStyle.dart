@@ -54,3 +54,21 @@ const kFillHeartIcon = Icon(
   Icons.favorite,
   color: Colors.red,
 );
+
+const kBookmarkTitle = TextStyle(
+  color: Colors.black,
+  fontSize: 25,
+);
+
+const kCommentIcon = Icon(Icons.comment_rounded);
+
+const kCurrentUserBio = TextStyle(
+  fontWeight: FontWeight.w600,
+);
+
+const kLikePostStyle = TextStyle(
+  fontWeight: FontWeight.w700,
+);
+const kProfileUserName = TextStyle(
+  fontWeight: FontWeight.bold,
+);
