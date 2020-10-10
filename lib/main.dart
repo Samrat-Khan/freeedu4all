@@ -27,35 +27,34 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  SharedPreferences sharedPreferences;
-  bool _value;
+  // SharedPreferences sharedPreferences;
+  // bool _value;
   @override
   void initState() {
-    callSharedPreps();
+    // callSharedPreps();
     super.initState();
   }
 
-  Future callSharedPreps() async {
-    await SharedPreferences.getInstance().then((value) {
-      sharedPreferences = value;
-      if (sharedPreferences.getBool("Dark") == null) {
-        _value = false;
-        Provider.of<DarkToLightTheme>(context, listen: false)
-            .changeTheme(_value);
-      } else {
-        _value = sharedPreferences.getBool("Dark");
-        Provider.of<DarkToLightTheme>(context, listen: false)
-            .changeTheme(_value);
-      }
-    });
-  }
+  // Future callSharedPreps() async {
+  //   await SharedPreferences.getInstance().then((value) {
+  //     sharedPreferences = value;
+  //     if (sharedPreferences.getBool("Dark") == null) {
+  //       _value = false;
+  //       Provider.of<DarkToLightTheme>(context, listen: false)
+  //           .changeTheme(_value);
+  //     } else {
+  //       _value = sharedPreferences.getBool("Dark");
+  //       Provider.of<DarkToLightTheme>(context, listen: false)
+  //           .changeTheme(_value);
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    var themeData = Provider.of<DarkToLightTheme>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: themeData.isDark ? ThemeData.dark() : ThemeData.light(),
+      theme: ThemeData.light(),
       initialRoute: "/LoginPage",
       onGenerateRoute: RouteGenerator.generateRoute,
     );

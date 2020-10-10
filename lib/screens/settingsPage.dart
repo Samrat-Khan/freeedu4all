@@ -12,16 +12,9 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  List _settingsOptionsName = [
-    "Edit Profile",
-    "Change Theme",
-    "Privacy",
-    "About",
-    "SignOut"
-  ];
+  List _settingsOptionsName = ["Edit Profile", "Privacy", "About", "SignOut"];
   List<IconData> _settingsOptionsIcon = [
     Icons.edit_rounded,
-    Icons.wb_sunny,
     Icons.privacy_tip_sharp,
     Icons.info,
     Icons.logout
@@ -63,7 +56,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    var themeProvider = Provider.of<DarkToLightTheme>(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -74,26 +66,20 @@ class _SettingsPageState extends State<SettingsPage> {
         body: ListView.separated(
             itemBuilder: (context, index) {
               return ListTile(
-                leading: index != 1
-                    ? Icon(_settingsOptionsIcon[index])
-                    : Icon(themeProvider.isDark
-                        ? Icons.nightlight_round
-                        : Icons.wb_sunny),
+                leading: Icon(_settingsOptionsIcon[index]),
                 title: Text(_settingsOptionsName[index]),
                 trailing: Icon(Icons.arrow_forward_ios_rounded),
                 onTap: () {
                   switch (index) {
                     case 0:
                       return editProfile();
-                    case 1:
-                      return changeTheme();
 
-                    case 2:
+                    case 1:
                       return readPrivacy();
-                    case 3:
+                    case 2:
                       return readAbout();
 
-                    case 4:
+                    case 3:
                       return logOut();
                   }
                 },

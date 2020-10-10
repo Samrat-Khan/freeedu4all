@@ -184,7 +184,10 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
           ),
         ),
         SizedBox(width: 15),
-        Text(ds.data()["BlogOwnerName"]),
+        Text(
+          ds.data()["BlogOwnerName"],
+          style: kReadingBlogAuthor,
+        ),
       ],
     );
   }
@@ -232,7 +235,8 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
 
   FloatingActionButton commentFAB(BuildContext context) {
     return FloatingActionButton(
-      child: Icon(Icons.comment_outlined),
+      child: kFABComment,
+      backgroundColor: Colors.white,
       onPressed: () {
         Navigator.pushNamed(
           context,

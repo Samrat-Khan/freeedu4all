@@ -2,6 +2,7 @@ import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/screens/bookmarkPage.dart';
 import 'package:education_community/screens/myProfilePage.dart';
 import 'package:education_community/screens/settingsPage.dart';
+import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavigationAppBar extends StatefulWidget {
@@ -40,7 +41,8 @@ class _BottomNavigationAppBarState extends State<BottomNavigationAppBar> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        backgroundColor: Colors.white,
+        child: kFAB,
         onPressed: () => Navigator.pushNamed(context, "BlogPostPage"),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -53,28 +55,28 @@ class _BottomNavigationAppBarState extends State<BottomNavigationAppBar> {
             IconButton(
               icon: Icon(
                 Icons.home,
-                color: selectedPage == 0 ? Colors.red : Colors.black,
+                color: selectedPage == 0 ? Colors.purple : Colors.black,
               ),
               onPressed: () => changePage(0),
             ),
             IconButton(
               icon: Icon(
                 Icons.bookmark_rounded,
-                color: selectedPage == 1 ? Colors.red : Colors.black,
+                color: selectedPage == 1 ? Colors.purple : Colors.black,
               ),
               onPressed: () => changePage(1),
             ),
             IconButton(
               icon: Icon(
                 Icons.account_circle_rounded,
-                color: selectedPage == 2 ? Colors.red : Colors.black,
+                color: selectedPage == 2 ? Colors.purple : Colors.black,
               ),
               onPressed: () => changePage(2),
             ),
             IconButton(
               icon: Icon(
                 Icons.settings,
-                color: selectedPage == 3 ? Colors.red : Colors.black,
+                color: selectedPage == 3 ? Colors.purple : Colors.black,
               ),
               onPressed: () => changePage(3),
             ),

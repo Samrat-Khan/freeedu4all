@@ -213,12 +213,16 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             Text(ds.data()["TotalLikes"].toString()),
                             SizedBox(width: 20),
                             IconButton(
-                                icon: kCommentIcon,
-                                onPressed: () {
-                                  Navigator.pushNamed(context, "CommentPage",
-                                      arguments: BlogReadToComment(
-                                          blogUID: ds.data()["BlogUid"]));
-                                }),
+                              icon: kCommentIcon,
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  "CommentPage",
+                                  arguments: BlogReadToComment(
+                                      blogUID: ds.data()["BlogUid"]),
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ),

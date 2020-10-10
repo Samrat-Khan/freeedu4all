@@ -6,6 +6,7 @@ const kAppTitle = TextStyle(
   fontFamily: 'electric_1',
   fontWeight: FontWeight.w700,
   fontSize: 18,
+  color: Colors.black,
 );
 
 const kTimelineBlogTitle = TextStyle(
@@ -32,10 +33,11 @@ const kReadingBlogDetail = TextStyle(
 
 const kReadingBlogAuthor = TextStyle(
   fontWeight: FontWeight.bold,
+  fontSize: 17,
 );
 
 const kReadingBlogTimeLike = TextStyle(
-  fontWeight: FontWeight.w500,
+  fontWeight: FontWeight.w800,
 );
 
 const kWarningText = TextStyle(
@@ -71,4 +73,13 @@ const kLikePostStyle = TextStyle(
 );
 const kProfileUserName = TextStyle(
   fontWeight: FontWeight.bold,
+);
+
+const kFAB = Icon(
+  Icons.add_box_rounded,
+  color: Colors.black,
+);
+const kFABComment = Icon(
+  Icons.comment_bank_outlined,
+  color: Colors.black,
 );

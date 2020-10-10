@@ -21,6 +21,8 @@ class _HomepageState extends State<Homepage> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           title: Text(
             "Edu Community",
             style: kAppTitle,
