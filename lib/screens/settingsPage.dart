@@ -1,8 +1,7 @@
-import 'package:education_community/providerServices/darkTheme.dart';
 import 'package:education_community/screens/loginPage.dart';
 import 'package:education_community/services/user_service.dart';
+import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'editProfilePage.dart';
 
@@ -12,22 +11,25 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  List _settingsOptionsName = ["Edit Profile", "Privacy", "About", "SignOut"];
+  List _settingsOptionsName = [
+    "Edit Profile",
+    "Draft Posts",
+    "Privacy",
+    "About",
+    "Delete Account",
+    "SignOut"
+  ];
   List<IconData> _settingsOptionsIcon = [
     Icons.edit_rounded,
+    Icons.article_rounded,
     Icons.privacy_tip_sharp,
     Icons.info,
+    Icons.delete_forever_rounded,
     Icons.logout
   ];
-  bool isSwitch = false;
-  EmailAuth _emailAuth = EmailAuth();
-  changeTheme() {
-    setState(() {
-      isSwitch = !isSwitch;
-      Provider.of<DarkToLightTheme>(context, listen: false)
-          .changeTheme(isSwitch);
-    });
-  }
+
+  draftPost() {}
+  deleteAccount() {}
 
   readPrivacy() {
     print("Privacy");
@@ -38,6 +40,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   logOut() async {
+    EmailAuth _emailAuth = EmailAuth();
     await _emailAuth.signOut().whenComplete(() {
       Navigator.pushAndRemoveUntil(
           context,
@@ -60,26 +63,41 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          centerTitle: true,
-          title: Text("Settings"),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text(
+            "Settings",
+            style: kSettingTitle,
+          ),
         ),
         body: ListView.separated(
             itemBuilder: (context, index) {
               return ListTile(
-                leading: Icon(_settingsOptionsIcon[index]),
-                title: Text(_settingsOptionsName[index]),
-                trailing: Icon(Icons.arrow_forward_ios_rounded),
+                leading: Icon(
+                  _settingsOptionsIcon[index],
+                  color: Colors.black,
+                ),
+                title: Text(
+                  _settingsOptionsName[index],
+                  style: kSettingMenu,
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.black,
+                ),
                 onTap: () {
                   switch (index) {
                     case 0:
                       return editProfile();
-
                     case 1:
+                      return draftPost();
+                    case 2:
                       return readPrivacy();
                     case 2:
                       return readAbout();
-
-                    case 3:
+                    case 4:
+                      return deleteAccount();
+                    case 5:
                       return logOut();
                   }
                 },

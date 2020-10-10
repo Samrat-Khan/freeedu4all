@@ -78,7 +78,7 @@ class _LogInPageState extends State<LogInPage> {
               height: _height,
               width: _width,
               decoration: BoxDecoration(
-                color: Colors.red,
+                color: Colors.black,
               ),
             ),
             Center(
@@ -162,7 +162,10 @@ class _LogInPageState extends State<LogInPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Text("log In"),
+            child: Text(
+              "log In",
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () async {
               if (_formKeyForExistUser.currentState.validate()) {
                 setState(() {
@@ -272,7 +275,10 @@ class _LogInPageState extends State<LogInPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Text("Sign Up"),
+            child: Text(
+              "Sign Up",
+              style: TextStyle(color: Colors.white),
+            ),
             onPressed: () async {
               setState(() {
                 _inAsyncCall = true;

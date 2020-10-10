@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
+import 'package:education_community/widgets/textStyle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -45,9 +46,13 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
       inAsyncCall: _inAsyncCall,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Update Bio"),
+          title: Text(
+            "Update Bio",
+            style: kSettingTitle,
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           automaticallyImplyLeading: false,
-          centerTitle: true,
         ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(15),
@@ -67,8 +72,11 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
               ),
               aboutUserTextField(),
               MaterialButton(
-                color: Colors.green,
-                child: Text("Submit"),
+                color: Colors.black,
+                child: Text(
+                  "Submit",
+                  style: TextStyle(color: Colors.black),
+                ),
                 onPressed: uploadUserDataToFireStore,
               ),
             ],

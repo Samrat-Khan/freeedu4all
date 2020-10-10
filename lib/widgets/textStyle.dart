@@ -15,7 +15,7 @@ const kTimelineBlogTitle = TextStyle(
 
 const kTimelineBlogType = TextStyle(
   fontWeight: FontWeight.w500,
-  color: Colors.redAccent,
+  color: Color(0xffFF00FF),
 );
 
 const kReadingBlogTitle = TextStyle(
@@ -82,4 +82,19 @@ const kFAB = Icon(
 const kFABComment = Icon(
   Icons.comment_bank_outlined,
   color: Colors.black,
+);
+
+const kSettingTitle = TextStyle(color: Colors.black, fontFamily: 'ubuntu');
+
+const kSettingMenu = TextStyle(
+  color: Colors.black,
+  fontWeight: FontWeight.w800,
+);
+
+const kBlogUploadTitle = TextStyle(
+  color: Colors.black,
+);
+const kBlogPostStyle = TextStyle(
+  color: Colors.black,
+  fontWeight: FontWeight.w800,
 );

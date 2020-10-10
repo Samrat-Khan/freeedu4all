@@ -54,7 +54,12 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light(),
+      theme: ThemeData(
+        primaryColor: Colors.black,
+        accentColor: Colors.black,
+        buttonColor: Colors.black,
+        fontFamily: "ubuntu",
+      ),
       initialRoute: "/LoginPage",
       onGenerateRoute: RouteGenerator.generateRoute,
     );

@@ -47,6 +47,10 @@ flutter:
       fonts:
         - asset: fonts/elec-rg.ttf
 
+    - family: ubuntu
+      fonts:
+        - asset: fonts/ubuntu.ttf
+
 
 
 

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/services/countLikeComment.dart';
@@ -16,7 +18,8 @@ class _MyProfilePageState extends State<MyProfilePage> {
       currentUserPhotoUrl,
       currentUserId,
       currentUserBio,
-      currentUserEmail;
+      currentUserEmail,
+      currentUserCoverPhotoUrl;
   int countTotalPost, countTotalLikes, countTotalComment;
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
     currentUserPhotoUrl = getUserData.data()["PhotoUrl"];
     currentUserBio = getUserData.data()["About"];
     currentUserEmail = getUserData.data()["Email"];
+    currentUserCoverPhotoUrl = getUserData.data()["CoverPhotoUrl"];
   }
 
   @override
@@ -96,76 +100,104 @@ class _MyProfilePageState extends State<MyProfilePage> {
               );
             }
             return Card(
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: MediaQuery.of(context).size.height / 8,
-                          width: MediaQuery.of(context).size.width / 4,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: FadeInImage(
-                              fit: BoxFit.cover,
-                              placeholder: AssetImage("images/google.png"),
-                              image: NetworkImage(currentUserPhotoUrl),
-                            ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      image: DecorationImage(
+                        image: NetworkImage(currentUserCoverPhotoUrl),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white.withOpacity(0.4),
                           ),
                         ),
-                        SizedBox(height: 15),
-                        Text(
-                          currentUserDisplayName,
-                          style: kProfileUserName,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: MediaQuery.of(context).size.height / 8,
+                              width: MediaQuery.of(context).size.width / 4,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: FadeInImage(
+                                  fit: BoxFit.cover,
+                                  placeholder: AssetImage("images/google.png"),
+                                  image: NetworkImage(currentUserPhotoUrl),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 15),
+                            Text(
+                              currentUserDisplayName,
+                              style: kProfileUserName,
+                            ),
+                          ],
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width / 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Text(
+                                  currentUserBio,
+                                  style: kCurrentUserBio,
+                                ),
+                              ),
+                              Divider(
+                                thickness: 2,
+                                color: Colors.black,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "$countTotalPost Post",
+                                      style: kLikePostStyle,
+                                    ),
+                                    SizedBox(width: 20),
+                                    Text(
+                                      "$countTotalLikes Like",
+                                      style: kLikePostStyle,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    Container(
-                      width: MediaQuery.of(context).size.width / 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            child: Text(
-                              currentUserBio,
-                              style: kCurrentUserBio,
-                            ),
-                          ),
-                          Divider(
-                            thickness: 2,
-                            color: Colors.black,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "$countTotalPost Post",
-                                  style: kLikePostStyle,
-                                ),
-                                SizedBox(width: 20),
-                                Text(
-                                  "$countTotalLikes Like",
-                                  style: kLikePostStyle,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           }),
@@ -190,6 +222,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: FadeInImage(
+                      height: MediaQuery.of(context).size.height / 4,
                       fit: BoxFit.cover,
                       placeholder: AssetImage("images/1.webp"),
                       image: NetworkImage(ds.data()["BlogPhotoUrl"]),

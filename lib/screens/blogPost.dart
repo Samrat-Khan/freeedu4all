@@ -21,7 +21,7 @@ class _BlogPostState extends State<BlogPost> {
   String blogTitle, blogDetail;
   String blogPhotoUrl, currentUserId;
   File imageFile;
-  String _result = "Fix";
+  String _result = "Solution";
   int _radioValue = 0;
   bool fieldIsEmpty;
   String blogId = Uuid().v4();
@@ -82,11 +82,15 @@ class _BlogPostState extends State<BlogPost> {
 
   AppBar postAppBar() {
     return AppBar(
-      centerTitle: true,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       automaticallyImplyLeading: false,
-      title: Text("Write Post"),
+      title: Text(
+        "Write Post",
+        style: kBlogUploadTitle,
+      ),
       leading: IconButton(
-        icon: Icon(Icons.cancel),
+        icon: Icon(Icons.arrow_back_ios_rounded, color: Colors.black),
         onPressed: () {
           imageFile = null;
           Navigator.pop(context);
@@ -94,7 +98,10 @@ class _BlogPostState extends State<BlogPost> {
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.cloud_upload),
+          icon: Icon(
+            Icons.cloud_upload,
+            color: Colors.black,
+          ),
           onPressed: () {
             fieldIsEmpty = checkAllFieldAreFullOrNot();
             showDialog(
@@ -108,11 +115,13 @@ class _BlogPostState extends State<BlogPost> {
                     : null,
                 actions: [
                   FlatButton.icon(
+                    color: Colors.black,
                     onPressed: fieldIsEmpty ? null : dataUploadToFirebase,
                     label: Text("Upload"),
                     icon: Icon(Icons.upload_outlined),
                   ),
                   FlatButton.icon(
+                    color: Colors.black,
                     onPressed: draftBlogDataToFirebase,
                     label: Text("Save As Draft"),
                     icon: Icon(Icons.drafts_outlined),
@@ -142,7 +151,10 @@ class _BlogPostState extends State<BlogPost> {
         ),
         child: Center(
           child: Container(
-            child: Text("Click To Upload a Photo"),
+            child: Text(
+              "Click To Upload a Photo",
+              style: kBlogPostStyle,
+            ),
             decoration: BoxDecoration(color: Colors.white.withOpacity(0.5)),
           ),
         ),
@@ -160,6 +172,7 @@ class _BlogPostState extends State<BlogPost> {
         decoration: InputDecoration(
           hintText: "What is Dark Matter ?",
           labelText: "Title of Your Post",
+          labelStyle: TextStyle(color: Colors.black),
           border: InputBorder.none,
         ),
         textInputAction: TextInputAction.next,
@@ -181,6 +194,7 @@ class _BlogPostState extends State<BlogPost> {
         decoration: InputDecoration(
           hintText: "All about Dark Matter....",
           labelText: "Detail of Your Post",
+          labelStyle: TextStyle(color: Colors.black),
           border: InputBorder.none,
         ),
         //  textInputAction: TextInputAction.done,
@@ -199,25 +213,41 @@ class _BlogPostState extends State<BlogPost> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Radio(
+            activeColor: Colors.black,
             value: 0,
             groupValue: _radioValue,
             onChanged: _handleRadioValueChange),
-        Text("Fix"),
+        Text(
+          "Fix",
+          style: kBlogPostStyle,
+        ),
         Radio(
+            activeColor: Colors.black,
             value: 1,
             groupValue: _radioValue,
             onChanged: _handleRadioValueChange),
-        Text("Info"),
+        Text(
+          "Info",
+          style: kBlogPostStyle,
+        ),
         Radio(
+            activeColor: Colors.black,
             value: 2,
             groupValue: _radioValue,
             onChanged: _handleRadioValueChange),
-        Text("Help"),
+        Text(
+          "Help",
+          style: kBlogPostStyle,
+        ),
         Radio(
+            activeColor: Colors.black,
             value: 3,
             groupValue: _radioValue,
             onChanged: _handleRadioValueChange),
-        Text("Giveaway"),
+        Text(
+          "Giveaway",
+          style: kBlogPostStyle,
+        ),
       ],
     );
   }
@@ -228,11 +258,11 @@ class _BlogPostState extends State<BlogPost> {
 
       switch (_radioValue) {
         case 0:
-          _result = "Fix";
+          _result = "Solution";
 
           break;
         case 1:
-          _result = "Info";
+          _result = "Information";
 
           break;
         case 2:

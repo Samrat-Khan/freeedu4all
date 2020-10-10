@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/services/firebase_service_forUpdataData.dart';
 import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/services/user_service.dart';
+import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
@@ -72,8 +73,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
       inAsyncCall: isUploading,
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: true,
-          title: Text("Edit Profile"),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_rounded, color: Colors.black),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            "Edit Profile",
+            style: kSettingTitle,
+          ),
         ),
         body: FutureBuilder(
           future: getUserData(),
@@ -181,6 +192,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           border: OutlineInputBorder(
                             borderSide: BorderSide(
                               width: 1.5,
+                              color: Colors.black,
                             ),
                           ),
                         ),
@@ -192,8 +204,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     MaterialButton(
                       elevation: 3,
-                      color: Colors.green,
-                      child: Text("Update"),
+                      color: Colors.black,
+                      child: Text(
+                        "Update",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       onPressed: () {
                         setState(() {
                           isUploading = true;
