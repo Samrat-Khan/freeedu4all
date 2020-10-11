@@ -90,7 +90,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
           future: getUserData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Text("Loading");
+              return Center(
+                child: CircularProgressIndicator(),
+              );
             }
             return SingleChildScrollView(
               child: Container(

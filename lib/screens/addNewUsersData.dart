@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/widgets/textStyle.dart';
@@ -20,12 +19,18 @@ class AddNewUsersData extends StatefulWidget {
 class _AddNewUsersDataState extends State<AddNewUsersData> {
   File fileImage;
   String displayName, aboutUser;
-  bool isAllFieldEmpty = true;
-  bool isUserEmailEmpty = true;
+  String userPhotoUrl;
 
+  bool isAllFieldEmpty = true;
+
+  bool isUserEmailEmpty = true;
+  String dummyText =
+      "Spent a large portion of my life coding. Will do the same in the next life";
   TextEditingController _displayNameTextEditController =
       TextEditingController();
   TextEditingController _aboutUserTextEditController = TextEditingController();
+
+  final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
@@ -42,44 +47,56 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
   bool _inAsyncCall = false;
   @override
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-      inAsyncCall: _inAsyncCall,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Update Bio",
-            style: kSettingTitle,
+    return SafeArea(
+      child: ModalProgressHUD(
+        inAsyncCall: _inAsyncCall,
+        child: Scaffold(
+          key: _key,
+          appBar: AppBar(
+            title: Text(
+              "Update Bio",
+              style: kSettingTitle,
+            ),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            automaticallyImplyLeading: false,
           ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-        ),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(15),
-          child: Column(
-            children: [
-              photoChooseContainer(),
-              SizedBox(
-                height: 20,
-              ),
-              displayNameTextField(),
-              SizedBox(
-                height: 10,
-              ),
-              userFixedEmailField(),
-              SizedBox(
-                height: 10,
-              ),
-              aboutUserTextField(),
-              MaterialButton(
-                color: Colors.black,
-                child: Text(
-                  "Submit",
-                  style: TextStyle(color: Colors.black),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(15),
+            child: Column(
+              children: [
+                photoChooseContainer(),
+                SizedBox(
+                  height: 20,
                 ),
-                onPressed: uploadUserDataToFireStore,
-              ),
-            ],
+                displayNameTextField(),
+                SizedBox(
+                  height: 10,
+                ),
+                userFixedEmailField(),
+                SizedBox(
+                  height: 10,
+                ),
+                aboutUserTextField(),
+                SizedBox(
+                  height: 10,
+                ),
+                MaterialButton(
+                  color: Colors.black,
+                  child: Text(
+                    "Submit",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  onPressed: uploadUserDataToFireStore,
+                ),
+                Text(
+                  "*All fields are mandatory",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -94,7 +111,8 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
 
   checkTextFieldEmptyOrNot() {
     if (_displayNameTextEditController.text.isEmpty == true ||
-        fileImage == null) {
+        fileImage == null ||
+        _aboutUserTextEditController.text.isEmpty) {
       setState(() {
         isAllFieldEmpty = true;
       });
@@ -106,32 +124,54 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
   }
 
   uploadUserDataToFireStore() async {
+    checkTextFieldEmptyOrNot();
     setState(() {
       _inAsyncCall = true;
     });
-    FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
-    String userPhotoUrl = await fireBaseService
-        .uploadUserProfilePhotoToFireStorage(fileImage, widget.user.uid);
-    fireBaseService
-        .updateUserDataToFirebase(
-      displayName: displayName,
-      aboutUser: aboutUser,
-      userEmail: widget.user.email,
-      photoUrl: userPhotoUrl,
-      uid: widget.user.uid,
-    )
-        .whenComplete(() {
-      Navigator.of(context).pushNamed(
-        "Homepage",
-        arguments: Homepage(),
+    try {
+      FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
+
+      if (isAllFieldEmpty == true) {
+        final snackBar = SnackBar(
+          content: Text("Fields are empty"),
+        );
+        _key.currentState.showSnackBar(snackBar);
+        setState(() {
+          _inAsyncCall = false;
+        });
+      } else {
+        userPhotoUrl = await fireBaseService
+            .uploadUserProfilePhotoToFireStorage(fileImage, widget.user.uid);
+
+        fireBaseService
+            .updateUserDataToFirebase(
+          displayName: displayName,
+          aboutUser: aboutUser,
+          userEmail: widget.user.email,
+          photoUrl: userPhotoUrl,
+          uid: widget.user.uid,
+        )
+            .whenComplete(() {
+          Navigator.of(context).pushNamed(
+            "BottomAppBar",
+          );
+          setState(() {
+            _inAsyncCall = false;
+          });
+        });
+      }
+    } catch (e) {
+      final snackBar = SnackBar(
+        content: Text(e.message),
       );
+      _key.currentState.showSnackBar(snackBar);
       setState(() {
         _inAsyncCall = false;
       });
-    });
+    }
   }
 
-  Container photoChooseContainer() {
+  photoChooseContainer() {
     return Container(
       height: 110,
       width: 110,
@@ -217,7 +257,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         maxLength: 110,
         textInputAction: TextInputAction.done,
         decoration: InputDecoration(
-          hintText: "Max 5 Lines",
+          hintText: dummyText,
           border: InputBorder.none,
           labelText: "About Yourself",
         ),

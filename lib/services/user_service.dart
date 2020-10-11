@@ -17,23 +17,15 @@ class CheckUserExist {
 
 class EmailAuth {
   Future signUpWithEmail({String email, String password}) async {
-    try {
-      UserCredential user = await firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      return user.user;
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-    }
+    UserCredential user = await firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+    return user.user;
   }
 
   Future signInWithEmail({String email, String password}) async {
-    try {
-      UserCredential user = await firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      return user.user;
-    } on FirebaseAuthException catch (e) {
-      print(e.message);
-    }
+    UserCredential user = await firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
+    return user.user;
   }
 
   Future signOut() async {

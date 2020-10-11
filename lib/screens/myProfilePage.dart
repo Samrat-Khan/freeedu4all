@@ -58,14 +58,14 @@ class _MyProfilePageState extends State<MyProfilePage> {
             if (!snapshot.hasData) {
               return Scaffold(
                 body: Center(
-                  child: LinearProgressIndicator(),
+                  child: CircularProgressIndicator(),
                 ),
               );
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Scaffold(
                 body: Center(
-                  child: LinearProgressIndicator(),
+                  child: CircularProgressIndicator(),
                 ),
               );
             }

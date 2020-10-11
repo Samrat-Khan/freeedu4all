@@ -17,10 +17,13 @@ class LogInPage extends StatefulWidget {
 
 class _LogInPageState extends State<LogInPage> {
   bool isLoggedIn = false;
-  TextEditingController _email = TextEditingController();
-  TextEditingController _password = TextEditingController();
+  TextEditingController _emailForExistUser = TextEditingController();
+  TextEditingController _passwordForExistUser = TextEditingController();
+  TextEditingController _emailForNewUser = TextEditingController();
+  TextEditingController _passwordForNewUser = TextEditingController();
   final GlobalKey<FormState> _formKeyForNewUser = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKeyForExistUser = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   bool isEmailValid(email) {
     return RegExp(
             r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
@@ -57,8 +60,8 @@ class _LogInPageState extends State<LogInPage> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    _password.dispose();
-    _email.dispose();
+    _passwordForExistUser.dispose();
+    _emailForExistUser.dispose();
   }
 
   @override
@@ -72,6 +75,7 @@ class _LogInPageState extends State<LogInPage> {
 
     return ModalProgressHUD(
       child: Scaffold(
+        key: _key,
         body: Stack(
           children: [
             Container(
@@ -119,7 +123,7 @@ class _LogInPageState extends State<LogInPage> {
             padding: const EdgeInsets.all(8.0),
             child: Container(
               child: TextFormField(
-                controller: _email,
+                controller: _emailForExistUser,
                 validator: (val) => isEmailValid(val) ? null : "Invalid Email",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
@@ -140,7 +144,7 @@ class _LogInPageState extends State<LogInPage> {
             padding: const EdgeInsets.all(8.0),
             child: Container(
               child: TextFormField(
-                controller: _password,
+                controller: _passwordForExistUser,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (val) =>
                     isPasswordValid(val) ? null : "Check Your Password",
@@ -166,33 +170,7 @@ class _LogInPageState extends State<LogInPage> {
               "log In",
               style: TextStyle(color: Colors.white),
             ),
-            onPressed: () async {
-              if (_formKeyForExistUser.currentState.validate()) {
-                setState(() {
-                  _inAsyncCall = true;
-                });
-                User user = await _emailAuth.signInWithEmail(
-                    email: _email.text, password: _password.text);
-                bool userExist =
-                    await _userExist.checkIfUserAlreadyExist(user.uid);
-                if (!userExist) {
-                  Navigator.pushNamed(context, "AddNewUserDataPage",
-                      arguments: LoginToNewUser(user));
-                  setState(() {
-                    _inAsyncCall = false;
-                  });
-                } else {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => BottomNavigationAppBar()),
-                      (route) => false);
-                  setState(() {
-                    _inAsyncCall = false;
-                  });
-                }
-              }
-            },
+            onPressed: () => logIn(),
           ),
           SizedBox(height: 10),
           RichText(
@@ -229,7 +207,7 @@ class _LogInPageState extends State<LogInPage> {
             padding: const EdgeInsets.all(8.0),
             child: Container(
               child: TextFormField(
-                controller: _email,
+                controller: _emailForNewUser,
                 validator: (val) => isEmailValid(val) ? null : "Invalid Email",
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 decoration: InputDecoration(
@@ -250,7 +228,7 @@ class _LogInPageState extends State<LogInPage> {
             padding: const EdgeInsets.all(8.0),
             child: Container(
               child: TextFormField(
-                controller: _password,
+                controller: _passwordForNewUser,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (val) =>
                     isPasswordValid(val) ? null : "Check Your Password",
@@ -279,21 +257,7 @@ class _LogInPageState extends State<LogInPage> {
               "Sign Up",
               style: TextStyle(color: Colors.white),
             ),
-            onPressed: () async {
-              setState(() {
-                _inAsyncCall = true;
-              });
-              if (_formKeyForNewUser.currentState.validate()) {
-                User user = await _emailAuth.signUpWithEmail(
-                    email: _email.text, password: _password.text);
-                await _emailAuth.verifyEmail();
-                Navigator.pushNamed(context, "AddNewUserDataPage",
-                    arguments: LoginToNewUser(user));
-                setState(() {
-                  _inAsyncCall = false;
-                });
-              }
-            },
+            onPressed: () => signUp(),
           ),
           SizedBox(height: 10),
           RichText(
@@ -323,6 +287,96 @@ class _LogInPageState extends State<LogInPage> {
   EmailAuth _emailAuth = EmailAuth();
   CheckUserExist _userExist = CheckUserExist();
   bool _inAsyncCall = false;
+
+  logIn() async {
+    try {
+      if (_formKeyForExistUser.currentState.validate()) {
+        setState(() {
+          _inAsyncCall = true;
+        });
+        dynamic user = await _emailAuth.signInWithEmail(
+            email: _emailForExistUser.text,
+            password: _passwordForExistUser.text);
+
+        if (user ==
+            "There is no user record corresponding to this identifier. The user may have been deleted.") {
+          _passwordForExistUser.clear();
+          final snackbar =
+              SnackBar(content: Text("Please Check Your Email Or Password"));
+          _key.currentState.showSnackBar(snackbar);
+          setState(() {
+            _inAsyncCall = false;
+          });
+        } else {
+          bool userExist = await _userExist.checkIfUserAlreadyExist(user.uid);
+          if (!userExist) {
+            Navigator.pushNamed(context, "AddNewUserDataPage",
+                arguments: LoginToNewUser(user));
+            setState(() {
+              _inAsyncCall = false;
+            });
+          } else {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BottomNavigationAppBar()),
+                (route) => false);
+            setState(() {
+              _inAsyncCall = false;
+            });
+          }
+        }
+      }
+    } catch (e) {
+      final snackBar =
+          SnackBar(content: Text("Please Check Your Email Or Password"));
+      _key.currentState.showSnackBar(snackBar);
+      setState(() {
+        _inAsyncCall = false;
+      });
+    }
+  }
+
+  signUp() async {
+    try {
+      setState(() {
+        _inAsyncCall = true;
+      });
+      if (_formKeyForNewUser.currentState.validate()) {
+        dynamic user = await _emailAuth.signUpWithEmail(
+            email: _emailForNewUser.text, password: _passwordForNewUser.text);
+
+        if (user ==
+            "The email has already been registered. Please login or reset your password.") {
+          final snackBar = SnackBar(
+              content: Text(
+                  "The email has already been registered. Please login or reset your password."));
+          _key.currentState.showSnackBar(snackBar);
+          setState(
+            () {
+              _inAsyncCall = false;
+            },
+          );
+        } else {
+          await _emailAuth.verifyEmail();
+          Navigator.pushNamed(context, "AddNewUserDataPage",
+              arguments: LoginToNewUser(user));
+          setState(() {
+            _inAsyncCall = false;
+          });
+        }
+      }
+    } catch (e) {
+      final snackBar = SnackBar(
+          content: Text(
+              "The email has already been registered. Please login or reset your password."));
+      _key.currentState.showSnackBar(snackBar);
+      setState(() {
+        _inAsyncCall = false;
+      });
+    }
+  }
+
   getCurrentUser() async {
     try {
       setState(() {

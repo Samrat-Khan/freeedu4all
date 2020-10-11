@@ -31,6 +31,7 @@ class FirebaseServiceSetData {
     String userEmail,
     String aboutUser,
     String uid,
+    String coverPhoto,
   }) async {
     CollectionReference userData = firebaseFirestore.collection("Users");
     await userData.doc(uid).set({
