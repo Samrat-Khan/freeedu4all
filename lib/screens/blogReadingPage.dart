@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/routes/routeDataPass.dart';
-import 'package:education_community/services/firebase_service_forUpdataData.dart';
+import 'package:education_community/services/firebaseUpdataDeleteData.dart';
 import 'package:education_community/services/timeCalCulations.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
@@ -86,8 +86,8 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
     );
   }
 
-  FirebaseServiceUpdateData _firebaseServiceUpdateData =
-      FirebaseServiceUpdateData();
+  FirebaseUpdateDeleteData _firebaseServiceUpdateData =
+      FirebaseUpdateDeleteData();
   Future handelLike(DocumentSnapshot ds) async {
     _isLiked = ds.data()["Likes"][currentUserId] == true;
     if (_isLiked == true) {
@@ -179,7 +179,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
             height: 30,
             width: 30,
             fit: BoxFit.cover,
-            placeholder: AssetImage("images/google.png"),
+            placeholder: AssetImage("images/profile.png"),
             image: NetworkImage(ds.data()["BlogOwnerPhotoUrl"]),
           ),
         ),
@@ -203,6 +203,9 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
       expandedHeight: 200,
       pinned: false,
       floating: true,
+      leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_rounded),
+          onPressed: () => Navigator.pop(context)),
       actions: [
         IconButton(
             icon: Icon(_isBookmarkChecked
@@ -222,7 +225,9 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
                   bottomRight: Radius.circular(30),
                 ),
                 image: DecorationImage(
-                  image: NetworkImage(ds.data()["BlogPhotoUrl"]),
+                  image: ds.data()["BlogPhotoUrl"] == null
+                      ? AssetImage("images/home.png")
+                      : NetworkImage(ds.data()["BlogPhotoUrl"]),
                   fit: BoxFit.cover,
                 ),
               ),

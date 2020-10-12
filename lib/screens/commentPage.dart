@@ -81,7 +81,7 @@ class _CommentPageState extends State<CommentPage> {
                       height: 30,
                       width: 30,
                       fit: BoxFit.cover,
-                      placeholder: AssetImage("images/google.png"),
+                      placeholder: AssetImage("images/profile.png"),
                       image: NetworkImage(ds.data()["CommentUserPhoto"]),
                     ),
                   ),
@@ -155,7 +155,7 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   submitComment() {
-    FirebaseServiceSetData firebaseServiceSetData = FirebaseServiceSetData();
+    FirebaseSetData firebaseServiceSetData = FirebaseSetData();
     firebaseServiceSetData
         .addCommentToBlog(
       userId: currentUserId,

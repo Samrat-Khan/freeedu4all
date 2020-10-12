@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import 'timeCalCulations.dart';
 
-class FirebaseServiceSetData {
+class FirebaseSetData {
   FirebaseStorage firebaseStorage = FirebaseStorage();
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   String uploadPhotoLink;

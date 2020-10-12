@@ -14,3 +14,15 @@ class BlogReadToComment {
   String blogUID;
   BlogReadToComment({this.blogUID});
 }
+
+class BlogToBlogEdit {
+  String blogUid, blogTitle, blogDetail, blogPhoto;
+  BlogToBlogEdit(
+      {this.blogUid, this.blogTitle, this.blogDetail, this.blogPhoto});
+}
+
+class DraftToDraftEdit {
+  String blogUid, blogTitle, blogDetail, blogPhoto;
+  DraftToDraftEdit(
+      {this.blogUid, this.blogTitle, this.blogDetail, this.blogPhoto});
+}

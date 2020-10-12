@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:education_community/services/firebase_service_forUpdataData.dart';
+import 'package:education_community/services/firebaseUpdataDeleteData.dart';
 import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
@@ -15,7 +15,7 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  String photo, bio, displayName;
+  String photo, bio, displayName, coverPhoto;
   String currentUserId;
   File fileImageOfDp, fileImageOfCover;
 
@@ -30,8 +30,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   updateData() async {
-    FirebaseServiceUpdateData firebaseServiceUpdateData =
-        FirebaseServiceUpdateData();
+    FirebaseUpdateDeleteData firebaseServiceUpdateData =
+        FirebaseUpdateDeleteData();
     await firebaseServiceUpdateData
         .updateUserProfileData(
       photoForDp: fileImageOfDp,
@@ -63,6 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     displayName = snapshot.data()["DisplayName"];
     bio = snapshot.data()["About"];
     photo = snapshot.data()["PhotoUrl"];
+    coverPhoto = snapshot.data()["CoverPhotoUrl"] ??= "";
   }
 
   bool isUploading = false;
@@ -109,7 +110,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: fileImageOfCover == null
-                                    ? AssetImage("images/google.png")
+                                    ? coverPhoto == ""
+                                        ? AssetImage("images/cover.png")
+                                        : NetworkImage(coverPhoto)
                                     : FileImage(fileImageOfCover),
                                 fit: BoxFit.cover,
                               ),
@@ -140,7 +143,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           CircleAvatar(
                             radius: 60,
                             backgroundImage: fileImageOfDp == null
-                                ? NetworkImage(photo)
+                                ? photo == null
+                                    ? AssetImage("images/profile.png")
+                                    : NetworkImage(photo)
                                 : FileImage(fileImageOfDp),
                             child: Container(
                               height: double.infinity,
@@ -178,7 +183,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                         onChanged: (text) {
                           displayName = text;
-                          print(displayName);
                         },
                       ),
                     ),
@@ -200,7 +204,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                         onChanged: (text) {
                           bio = text;
-                          print(bio);
                         },
                       ),
                     ),

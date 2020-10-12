@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/routes/routeDataPass.dart';
-import 'package:education_community/services/firebase_service_forUpdataData.dart';
+import 'package:education_community/services/firebaseUpdataDeleteData.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/material.dart';
@@ -65,8 +65,9 @@ class _BookMarkPageState extends State<BookMarkPage> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 image: DecorationImage(
-                                  image:
-                                      NetworkImage(ds.data()["BlogPhotoUrl"]),
+                                  image: ds.data()["BlogPhotoUrl"] == null
+                                      ? AssetImage("images/home.png")
+                                      : NetworkImage(ds.data()["BlogPhotoUrl"]),
                                   fit: BoxFit.cover,
                                 )),
                           ),
@@ -117,7 +118,7 @@ class _BookMarkPageState extends State<BookMarkPage> {
     );
   }
 
-  FirebaseServiceUpdateData _serviceUpdateData = FirebaseServiceUpdateData();
+  FirebaseUpdateDeleteData _serviceUpdateData = FirebaseUpdateDeleteData();
   handelBookmark({String blogUID}) {
     _serviceUpdateData.handelBookmark(
       currentUserID: currentUser,

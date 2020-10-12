@@ -1,11 +1,13 @@
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/screens/HomePage.dart';
 import 'package:education_community/screens/addNewUsersData.dart';
+import 'package:education_community/screens/blogEditPage.dart';
 import 'package:education_community/screens/blogPost.dart';
 import 'package:education_community/screens/blogReadingPage.dart';
 import 'package:education_community/screens/bookmarkPage.dart';
 import 'package:education_community/screens/bottomAppBar.dart';
 import 'package:education_community/screens/commentPage.dart';
+import 'package:education_community/screens/draftPost.dart';
 import 'package:education_community/screens/editProfilePage.dart';
 import 'package:education_community/screens/loginPage.dart';
 import 'package:education_community/screens/myProfilePage.dart';
@@ -57,6 +59,30 @@ class RouteGenerator {
       case "BottomAppBar":
         return MaterialPageRoute(
             builder: (context) => BottomNavigationAppBar());
+      case "DraftPost":
+        return MaterialPageRoute(builder: (context) => DraftPost());
+      case "BlogEditPage":
+        return MaterialPageRoute(builder: (context) {
+          BlogToBlogEdit blogEdit = args;
+
+          return BlogEditPage(
+            blogTitle: blogEdit.blogTitle,
+            blogDetail: blogEdit.blogDetail,
+            blogUid: blogEdit.blogUid,
+            blogPhoto: blogEdit.blogPhoto,
+          );
+        });
+      case "DraftBlogEditPage":
+        return MaterialPageRoute(builder: (context) {
+          DraftToDraftEdit blogEdit = args;
+          return BlogEditPage(
+            blogTitle: blogEdit.blogTitle,
+            blogDetail: blogEdit.blogDetail,
+            blogUid: blogEdit.blogUid,
+            blogPhoto: blogEdit.blogPhoto,
+            blogType: "Draft",
+          );
+        });
       default:
         return _errorPage(settings.name);
     }

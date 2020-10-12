@@ -145,7 +145,7 @@ class _BlogPostState extends State<BlogPost> {
           image: DecorationImage(
             image: imageFile != null
                 ? FileImage(imageFile)
-                : AssetImage("images/no-image.jpg"),
+                : AssetImage("images/post.png"),
             fit: BoxFit.cover,
           ),
         ),
@@ -292,7 +292,7 @@ class _BlogPostState extends State<BlogPost> {
     setState(() {
       _inAsyncCall = true;
     });
-    FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
+    FirebaseSetData fireBaseService = FirebaseSetData();
     blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(imageFile,
         Provider.of<UserProvider>(context, listen: false).user, blogId);
     fireBaseService
@@ -322,7 +322,7 @@ class _BlogPostState extends State<BlogPost> {
       _inAsyncCall = true;
     });
 
-    FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
+    FirebaseSetData fireBaseService = FirebaseSetData();
     if (imageFile != null) {
       blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
           imageFile, currentUserId, blogId);

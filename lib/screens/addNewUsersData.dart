@@ -129,7 +129,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
       _inAsyncCall = true;
     });
     try {
-      FirebaseServiceSetData fireBaseService = FirebaseServiceSetData();
+      FirebaseSetData fireBaseService = FirebaseSetData();
 
       if (isAllFieldEmpty == true) {
         final snackBar = SnackBar(
@@ -185,7 +185,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
                 borderRadius: BorderRadius.circular(50),
                 image: DecorationImage(
                   image: fileImage == null
-                      ? AssetImage("images/14.png")
+                      ? AssetImage("images/profile.png")
                       : FileImage(fileImage),
                   fit: BoxFit.cover,
                 ),

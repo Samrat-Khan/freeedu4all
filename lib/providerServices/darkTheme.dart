@@ -19,9 +19,9 @@ class DarkToLightTheme with ChangeNotifier {
       _preferences = await SharedPreferences.getInstance();
   }
 
-  Future<bool> _getDataFromPrep() async {
-    return _preferences.getBool(key);
-  }
+  // Future<bool> _getDataFromPrep() async {
+  //   return _preferences.getBool(key);
+  // }
 
   _savePrep() async {
     _preferences.setBool(key, _isDark);

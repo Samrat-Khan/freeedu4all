@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/services/countLikeComment.dart';
+import 'package:education_community/services/firebaseUpdataDeleteData.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
@@ -109,7 +110,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       image: DecorationImage(
-                        image: NetworkImage(currentUserCoverPhotoUrl),
+                        image: currentUserCoverPhotoUrl != null
+                            ? NetworkImage(currentUserCoverPhotoUrl)
+                            : AssetImage("images/cover.png"),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -147,7 +150,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                                 borderRadius: BorderRadius.circular(100),
                                 child: FadeInImage(
                                   fit: BoxFit.cover,
-                                  placeholder: AssetImage("images/google.png"),
+                                  placeholder: AssetImage("images/profile.png"),
                                   image: NetworkImage(currentUserPhotoUrl),
                                 ),
                               ),
@@ -224,7 +227,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                     child: FadeInImage(
                       height: MediaQuery.of(context).size.height / 4,
                       fit: BoxFit.cover,
-                      placeholder: AssetImage("images/1.webp"),
+                      placeholder: AssetImage("images/home.png"),
                       image: NetworkImage(ds.data()["BlogPhotoUrl"]),
                     ),
                   ),
@@ -259,14 +262,26 @@ class _MyProfilePageState extends State<MyProfilePage> {
                           ],
                         ),
                       ),
-                      PopupMenuButton(itemBuilder: (context) {
-                        return {"Edit", "Delete"}.map((String choice) {
-                          return PopupMenuItem(
-                            child: Text(choice),
-                            value: choice,
+                      PopupMenuButton(
+                        itemBuilder: (context) {
+                          return {"Edit", "Delete"}.map((String choice) {
+                            return PopupMenuItem(
+                              child: Text(choice),
+                              value: choice,
+                            );
+                          }).toList();
+                        },
+                        onSelected: (value) {
+                          handelSelect(
+                            value: value,
+                            currentUser: currentUserId,
+                            blogPhotoUrl: ds.data()["BlogPhotoUrl"],
+                            blogUid: ds.data()["BlogUid"],
+                            blogTitle: ds.data()["BlogTitle"],
+                            blogDetail: ds.data()["BlogDetail"],
                           );
-                        }).toList();
-                      }),
+                        },
+                      ),
                     ],
                   ),
                 ],
@@ -278,5 +293,39 @@ class _MyProfilePageState extends State<MyProfilePage> {
     );
   }
 
-  handelSelect() {}
+  handelSelect(
+      {String value,
+      String blogUid,
+      String currentUser,
+      String blogPhotoUrl,
+      String blogTitle,
+      String blogDetail}) {
+    switch (value) {
+      case "Edit":
+        return Navigator.pushNamed(context, "BlogEditPage",
+            arguments: BlogToBlogEdit(
+              blogUid: blogUid,
+              blogPhoto: blogPhotoUrl,
+              blogTitle: blogTitle,
+              blogDetail: blogDetail,
+            ));
+
+      case "Delete":
+        return deletePost(
+          blogUid: blogUid,
+          currentUserId: currentUser,
+          blogPhotoUrl: blogPhotoUrl,
+        );
+    }
+  }
+
+  Delete _delete = Delete();
+  deletePost(
+      {String blogUid, String currentUserId, String blogPhotoUrl}) async {
+    await _delete.deletePublishBlog(
+      blogUid: blogUid,
+      currentUserId: currentUserId,
+      blogPhotoUrl: blogPhotoUrl,
+    );
+  }
 }

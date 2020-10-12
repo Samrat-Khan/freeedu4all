@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/routes/routeDataPass.dart';
-import 'package:education_community/widgets/loadingWidget.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +34,10 @@ class _HomepageState extends State<Homepage> {
               .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return Center(child: LoadingWidget());
+              return Center(child: CircularProgressIndicator());
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: LoadingWidget());
+              return Center(child: CircularProgressIndicator());
             } else
               return ListView.builder(
                 itemCount: snapshot.data.documents.length,
@@ -60,8 +59,10 @@ class _HomepageState extends State<Homepage> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   image: DecorationImage(
-                                    image:
-                                        NetworkImage(ds.data()["BlogPhotoUrl"]),
+                                    image: ds.data()["BlogPhotoUrl"] == null
+                                        ? AssetImage("images/home.png")
+                                        : NetworkImage(
+                                            ds.data()["BlogPhotoUrl"]),
                                     fit: BoxFit.cover,
                                   )),
                             ),
