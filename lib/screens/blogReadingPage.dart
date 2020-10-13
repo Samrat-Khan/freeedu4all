@@ -69,7 +69,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
                           SizedBox(height: 15),
                           rowOfPhotoAndName(ds),
                           SizedBox(height: 15),
-                          Text(
+                          SelectableText(
                             ds.data()["BlogDetail"],
                             style: kReadingBlogDetail,
                           ),

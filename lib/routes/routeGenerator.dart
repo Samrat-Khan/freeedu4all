@@ -1,5 +1,6 @@
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/screens/HomePage.dart';
+import 'package:education_community/screens/aboutPrivacyPage.dart';
 import 'package:education_community/screens/addNewUsersData.dart';
 import 'package:education_community/screens/blogEditPage.dart';
 import 'package:education_community/screens/blogPost.dart';
@@ -21,6 +22,9 @@ class RouteGenerator {
     switch (settings.name) {
       case "/LoginPage":
         return MaterialPageRoute(builder: (context) => LogInPage());
+      case "ForgotPassword":
+        return MaterialPageRoute(builder: (context) => ForgotPassword());
+
       case "AddNewUserDataPage":
         return MaterialPageRoute(builder: (context) {
           LoginToNewUser loginToNewUser = args;
@@ -83,6 +87,8 @@ class RouteGenerator {
             blogType: "Draft",
           );
         });
+      case "AboutPrivacyPage":
+        return MaterialPageRoute(builder: (context) => AboutPrivacyPage());
       default:
         return _errorPage(settings.name);
     }

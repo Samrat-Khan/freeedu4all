@@ -17,6 +17,7 @@ class LogInPage extends StatefulWidget {
 
 class _LogInPageState extends State<LogInPage> {
   bool isLoggedIn = false;
+  bool showPassword = true;
   TextEditingController _emailForExistUser = TextEditingController();
   TextEditingController _passwordForExistUser = TextEditingController();
   TextEditingController _emailForNewUser = TextEditingController();
@@ -125,7 +126,7 @@ class _LogInPageState extends State<LogInPage> {
               child: TextFormField(
                 controller: _emailForExistUser,
                 validator: (val) => isEmailValid(val) ? null : "Invalid Email",
-                autovalidateMode: AutovalidateMode.onUserInteraction,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.alternate_email_rounded),
                   hintText: "Email",
@@ -145,10 +146,15 @@ class _LogInPageState extends State<LogInPage> {
             child: Container(
               child: TextFormField(
                 controller: _passwordForExistUser,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
+                obscureText: showPassword,
                 validator: (val) =>
                     isPasswordValid(val) ? null : "Check Your Password",
                 decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        showPassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: toggleVisibility,
+                  ),
                   prefixIcon: Icon(Icons.lock),
                   hintText: "Password",
                   border: OutlineInputBorder(
@@ -171,6 +177,15 @@ class _LogInPageState extends State<LogInPage> {
               style: TextStyle(color: Colors.white),
             ),
             onPressed: () => logIn(),
+          ),
+          SizedBox(height: 10),
+          RichText(
+            text: TextSpan(
+              text: "Forgot Password ?",
+              style: TextStyle(color: Colors.black),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => Navigator.pushNamed(context, "ForgotPassword"),
+            ),
           ),
           SizedBox(height: 10),
           RichText(
@@ -209,7 +224,7 @@ class _LogInPageState extends State<LogInPage> {
               child: TextFormField(
                 controller: _emailForNewUser,
                 validator: (val) => isEmailValid(val) ? null : "Invalid Email",
-                autovalidateMode: AutovalidateMode.onUserInteraction,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   prefixIcon: Icon(Icons.alternate_email_rounded),
                   hintText: "Email",
@@ -229,10 +244,15 @@ class _LogInPageState extends State<LogInPage> {
             child: Container(
               child: TextFormField(
                 controller: _passwordForNewUser,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (val) =>
                     isPasswordValid(val) ? null : "Check Your Password",
+                obscureText: showPassword,
                 decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                        showPassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: toggleVisibility,
+                  ),
                   prefixIcon: Icon(Icons.lock),
                   hintText: "Password",
                   helperMaxLines: 4,
@@ -287,6 +307,11 @@ class _LogInPageState extends State<LogInPage> {
   EmailAuth _emailAuth = EmailAuth();
   CheckUserExist _userExist = CheckUserExist();
   bool _inAsyncCall = false;
+  toggleVisibility() {
+    setState(() {
+      showPassword = !showPassword;
+    });
+  }
 
   logIn() async {
     try {
@@ -406,5 +431,98 @@ class _LogInPageState extends State<LogInPage> {
         }
       }
     } catch (e) {}
+  }
+}
+
+// ignore: must_be_immutable
+class ForgotPassword extends StatelessWidget {
+  final TextEditingController _controller = TextEditingController();
+  final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
+  @override
+  Widget build(BuildContext context) {
+    var _height = MediaQuery.of(context).size.height;
+    var _width = MediaQuery.of(context).size.width;
+    return Scaffold(
+      key: _key,
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_rounded,
+              color: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(context)),
+        title: Text(
+          "Forgot Password",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(),
+          Container(
+            height: _height * 0.4,
+            width: _width * 0.8,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: TextField(
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _controller,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.alternate_email_rounded),
+                        hintText: "example@mail.com",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide(
+                            color: Colors.yellowAccent,
+                            width: 3,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  RaisedButton(
+                    child: Text(
+                      "Send",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () => doPasswordReset(context),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  EmailAuth _emailAuth = EmailAuth();
+  doPasswordReset(BuildContext context) async {
+    try {
+      await _emailAuth.forgotPassword(email: _controller.text).whenComplete(() {
+        final snackBar =
+            SnackBar(content: Text("Check Your Email, we've send a link"));
+        _key.currentState.showSnackBar(snackBar);
+        Future.delayed(Duration(seconds: 3))
+            .then((value) => Navigator.of(context).pop());
+      });
+    } catch (e) {
+      final snackBar = SnackBar(
+          content: Text("An Unexpected error occurs, please try again later"));
+      _key.currentState.showSnackBar(snackBar);
+    }
   }
 }
