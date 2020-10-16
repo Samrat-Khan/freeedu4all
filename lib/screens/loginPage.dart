@@ -2,6 +2,7 @@ import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/screens/bottomAppBar.dart';
 import 'package:education_community/services/user_service.dart';
+import 'package:education_community/widgets/textStyle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -118,8 +119,16 @@ class _LogInPageState extends State<LogInPage> {
     return Form(
       key: _formKeyForExistUser,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 35),
+            child: Text(
+              "freedu4all",
+              style: kAppTitle,
+            ),
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height / 12),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
@@ -218,6 +227,11 @@ class _LogInPageState extends State<LogInPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Text(
+            "freedu4all",
+            style: kAppTitle,
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height / 16),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(

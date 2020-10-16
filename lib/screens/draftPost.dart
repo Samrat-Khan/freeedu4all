@@ -68,7 +68,7 @@ class _DraftPostState extends State<DraftPost> {
                   ),
                   title: Text(
                     ds.data()["BlogTitle"] == null
-                        ? "You Haven't any title yet"
+                        ? "You Haven't specify any title yet"
                         : ds.data()["BlogTitle"],
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,

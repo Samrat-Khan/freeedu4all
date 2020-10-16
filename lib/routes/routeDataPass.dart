@@ -26,3 +26,8 @@ class DraftToDraftEdit {
   DraftToDraftEdit(
       {this.blogUid, this.blogTitle, this.blogDetail, this.blogPhoto});
 }
+
+class SettingToReadPrivacy {
+  String text;
+  SettingToReadPrivacy({this.text});
+}

@@ -88,7 +88,12 @@ class RouteGenerator {
           );
         });
       case "AboutPrivacyPage":
-        return MaterialPageRoute(builder: (context) => AboutPrivacyPage());
+        return MaterialPageRoute(builder: (context) {
+          SettingToReadPrivacy settingToReadPrivacy = args;
+          return AboutPrivacyPage(
+            text: settingToReadPrivacy.text,
+          );
+        });
       default:
         return _errorPage(settings.name);
     }

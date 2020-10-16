@@ -25,6 +25,110 @@ class FirebaseSetData {
     return uploadPhotoLink;
   }
 
+  ///WhatImage also define where fileImage will be upload on Firebase Storage
+  ///If it PostImage => PostImage/UserId/BlogUid.jpg
+  ///UserImage => UserImage/UserId/UserId.jpg
+  ///CoverImage => CoverImage/UserId/UserId.jpg
+
+  Future<String> photoUploadCommon(
+      {String whatImage, String userId, String blogUid, File fileImage}) async {
+    final StorageReference reference =
+        firebaseStorage.ref().child(whatImage == "UserImage"
+            ? "$whatImage/$userId/$userId.jpg"
+            : whatImage == "PostImage"
+                ? "$whatImage/$userId/$blogUid.jpg"
+                : "$whatImage/$userId/$userId.jpg");
+
+    final StorageUploadTask task = reference.putFile(fileImage);
+    await task.onComplete;
+    uploadPhotoLink = await reference.getDownloadURL();
+    return uploadPhotoLink;
+  }
+
+  ///WhatBlog define where blog data upload to Publish Section or Draft Section
+
+  Future uploadBlog({
+    String whatBlog,
+    String blogTitle,
+    String blogUid,
+    String blogType,
+    String blogSubType,
+    String blogDetail,
+    String userId,
+    int timeStamp,
+    File fileImage,
+  }) async {
+    ///
+    String month = monthFormat.getMonth(currentDateTime.month);
+
+    ///
+    DocumentSnapshot variable =
+        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
+
+    ///
+    String blogPhotoUrl;
+
+    ///
+    if (whatBlog == "Publish") {
+      //
+      blogPhotoUrl = await photoUploadCommon(
+          whatImage: "PostImage",
+          userId: userId,
+          blogUid: blogUid,
+          fileImage: fileImage);
+
+      ///
+      CollectionReference blogData = firebaseFirestore.collection("Blog");
+
+      ///
+      await blogData.doc(blogUid).set({
+        "BlogOwnerId": userId,
+        "BlogOwnerName": variable.data()["DisplayName"],
+        "BlogOwnerPhotoUrl": variable.data()["PhotoUrl"],
+        "BlogTitle": blogTitle,
+        "BlogDetail": blogDetail,
+        "BlogType": blogType,
+        "BlogSubType": blogSubType,
+        "BlogPhotoUrl": blogPhotoUrl,
+        "BlogUid": blogUid,
+        "TimeStamp": timeStamp,
+        "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
+        "TotalLikes": 0,
+        "Likes": {},
+        "Bookmark": {},
+      });
+      //
+    }
+    //
+    else {
+      //
+      CollectionReference draftBlog = firebaseFirestore.collection("DraftBlog");
+      //
+      if (fileImage != null) {
+        //
+        blogPhotoUrl = await photoUploadCommon(
+            whatImage: "PostImage",
+            userId: userId,
+            blogUid: blogUid,
+            fileImage: fileImage);
+        //
+      }
+      //
+      await draftBlog.doc(blogUid).set({
+        "BlogOwnerId": userId,
+        "BlogTitle": blogTitle,
+        "BlogDetail": blogDetail,
+        "BlogType": blogType,
+        "BlogPhotoUrl": blogPhotoUrl,
+        "BlogUid": blogUid,
+        "TimeStamp": timeStamp,
+        "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
+      });
+      //
+    }
+    //
+  }
+
   Future updateUserDataToFirebase({
     String displayName,
     String photoUrl,

@@ -52,6 +52,8 @@ flutter:
         - asset: fonts/ubuntu.ttf
 
 
-
+    - family: pacifico
+      fonts:
+        - asset: fonts/Pacifico.ttf
 
 

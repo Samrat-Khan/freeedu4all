@@ -3,9 +3,15 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 const kAppTitle = TextStyle(
+  fontFamily: 'pacifico',
+  fontWeight: FontWeight.w700,
+  fontSize: 35,
+  color: Colors.black,
+);
+const kAppTitleText = TextStyle(
   fontFamily: 'electric_1',
   fontWeight: FontWeight.w700,
-  fontSize: 18,
+  fontSize: 20,
   color: Colors.black,
 );
 

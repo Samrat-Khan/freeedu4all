@@ -23,8 +23,8 @@ class _HomepageState extends State<Homepage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           title: Text(
-            "Edu Community",
-            style: kAppTitle,
+            "freedu4all",
+            style: kAppTitleText,
           ),
         ),
         body: StreamBuilder(
@@ -43,69 +43,81 @@ class _HomepageState extends State<Homepage> {
                 itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data.documents[index];
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: InkWell(
-                      child: Container(
-                        height: MediaQuery.of(context).size.height / 7,
-                        width: MediaQuery.of(context).size.width / 4,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: 90,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  image: DecorationImage(
-                                    image: ds.data()["BlogPhotoUrl"] == null
-                                        ? AssetImage("images/home.png")
-                                        : NetworkImage(
-                                            ds.data()["BlogPhotoUrl"]),
-                                    fit: BoxFit.cover,
-                                  )),
-                            ),
-                            SizedBox(width: 15),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Text(
-                                  ds.data()["BlogType"],
-                                  style: kTimelineBlogType,
-                                ),
-                                Container(
-                                  width:
-                                      MediaQuery.of(context).size.width / 1.9,
-                                  child: Text(
-                                    ds.data()["BlogTitle"],
-                                    softWrap: true,
-                                    overflow: TextOverflow.fade,
-                                    style: kTimelineBlogTitle,
-                                  ),
-                                ),
-                                Text(ds.data()["DateTime"]),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      onTap: () async {
-                        Navigator.of(context).pushNamed(
-                          "BlogReadPage",
-                          arguments: HomeToBlogRead(
-                            blogUID: ds.data()["BlogUid"],
-                            blogOwnerID: ds.data()["BlogOwnerId"],
-                          ),
-                        );
-                      },
-                    ),
-                  );
+                  return ArticleOverView(ds: ds);
                 },
               );
           },
         ),
+      ),
+    );
+  }
+}
+
+class ArticleOverView extends StatelessWidget {
+  const ArticleOverView({
+    Key key,
+    @required this.ds,
+  }) : super(key: key);
+
+  final DocumentSnapshot ds;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        child: Container(
+          height: MediaQuery.of(context).size.height / 7,
+          width: MediaQuery.of(context).size.width / 4,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                height: 90,
+                width: 90,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    image: DecorationImage(
+                      image: ds.data()["BlogPhotoUrl"] == null
+                          ? AssetImage("images/home.png")
+                          : NetworkImage(ds.data()["BlogPhotoUrl"]),
+                      fit: BoxFit.cover,
+                    )),
+              ),
+              SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    ds.data()["BlogType"],
+                    style: kTimelineBlogType,
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width / 1.9,
+                    child: Text(
+                      ds.data()["BlogTitle"],
+                      softWrap: true,
+                      overflow: TextOverflow.fade,
+                      style: kTimelineBlogTitle,
+                    ),
+                  ),
+                  Text(ds.data()["DateTime"]),
+                ],
+              ),
+            ],
+          ),
+        ),
+        onTap: () async {
+          Navigator.of(context).pushNamed(
+            "BlogReadPage",
+            arguments: HomeToBlogRead(
+              blogUID: ds.data()["BlogUid"],
+              blogOwnerID: ds.data()["BlogOwnerId"],
+            ),
+          );
+        },
       ),
     );
   }

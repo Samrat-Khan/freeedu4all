@@ -27,9 +27,10 @@ class _BlogPostState extends State<BlogPost> {
   String blogId = Uuid().v4();
   TextEditingController _titleTextController = TextEditingController();
   TextEditingController _detailTextController = TextEditingController();
+  final PageController _page = PageController();
   int timeStamp = DateTime.now().microsecondsSinceEpoch;
   bool _inAsyncCall = false;
-
+  bool isSelected = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -44,6 +45,7 @@ class _BlogPostState extends State<BlogPost> {
     super.dispose();
     _detailTextController.dispose();
     _titleTextController.dispose();
+    _page.dispose();
   }
 
   @override
@@ -53,28 +55,33 @@ class _BlogPostState extends State<BlogPost> {
 
     return ModalProgressHUD(
       inAsyncCall: _inAsyncCall,
-      child: Scaffold(
-        appBar: postAppBar(),
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              photoUploadContainer(_width, _height),
-              SizedBox(
-                height: 10,
-              ),
-              postTypeSelectRow(),
-              SizedBox(
-                height: 10,
-              ),
-              postTitleWriteBox(),
-              SizedBox(
-                height: 25,
-              ),
-              postDetailWriteBox(),
-            ],
-          ),
+      child: scaffoldForBlogWriting(_width, _height),
+    );
+  }
+
+  ///Here User write His/Her Article
+  Scaffold scaffoldForBlogWriting(double _width, double _height) {
+    return Scaffold(
+      appBar: postAppBar(),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            photoUploadContainer(_width, _height),
+            SizedBox(
+              height: 10,
+            ),
+            postTypeSelectRow(),
+            SizedBox(
+              height: 10,
+            ),
+            postTitleWriteBox(),
+            SizedBox(
+              height: 25,
+            ),
+            postDetailWriteBox(),
+          ],
         ),
       ),
     );
@@ -292,29 +299,39 @@ class _BlogPostState extends State<BlogPost> {
     setState(() {
       _inAsyncCall = true;
     });
-    FirebaseSetData fireBaseService = FirebaseSetData();
-    blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(imageFile,
-        Provider.of<UserProvider>(context, listen: false).user, blogId);
-    fireBaseService
-        .updateBlogDataToFirebase(
-      blogTitle: blogTitle,
-      blogDetail: blogDetail,
-      blogUid: blogId,
-      timeStamp: timeStamp,
-      blogPhotoUrl: blogPhotoUrl,
-      blogType: _result,
-      userId: currentUserId,
-    )
-        .whenComplete(
-      () {
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => BottomNavigationAppBar()),
-            (route) => false);
-      },
-    );
-    setState(() {
-      _inAsyncCall = false;
-    });
+    try {
+      Navigator.pop(context);
+      FirebaseSetData fireBaseService = FirebaseSetData();
+
+      blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
+          imageFile,
+          Provider.of<UserProvider>(context, listen: false).user,
+          blogId);
+      fireBaseService
+          .updateBlogDataToFirebase(
+        blogTitle: blogTitle,
+        blogDetail: blogDetail,
+        blogUid: blogId,
+        timeStamp: timeStamp,
+        blogPhotoUrl: blogPhotoUrl,
+        blogType: _result,
+        userId: currentUserId,
+      )
+          .whenComplete(
+        () {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => BottomNavigationAppBar()),
+              (route) => false);
+        },
+      );
+      setState(() {
+        _inAsyncCall = false;
+      });
+    } catch (e) {
+      setState(() {
+        _inAsyncCall = false;
+      });
+    }
   }
 
   draftBlogDataToFirebase() async {

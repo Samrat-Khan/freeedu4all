@@ -1,4 +1,5 @@
 import 'package:education_community/main.dart';
+import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/screens/loginPage.dart';
 import 'package:education_community/services/firebaseUpdataDeleteData.dart';
 import 'package:education_community/services/user_service.dart';
@@ -68,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       });
                     } catch (e) {
                       print(
-                          "En error occured during user data deleting ${e.message}");
+                          "En error occurs during user data deleting ${e.message}");
                     }
                   },
                   child: Text("Yes")),
@@ -78,11 +79,13 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   readPrivacy() {
-    print("Privacy");
+    Navigator.pushNamed(context, "AboutPrivacyPage",
+        arguments: SettingToReadPrivacy(text: "Privacy"));
   }
 
   readAbout() {
-    print("About");
+    Navigator.pushNamed(context, "AboutPrivacyPage",
+        arguments: SettingToReadPrivacy(text: "About"));
   }
 
   logOut() async {
@@ -149,7 +152,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         return draftPost();
                       case 2:
                         return readPrivacy();
-                      case 2:
+                      case 3:
                         return readAbout();
                       case 4:
                         return deleteAccount(context: context);
