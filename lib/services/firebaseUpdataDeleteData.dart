@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/timeCalCulations.dart';
-import 'package:education_community/services/user_service.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseUpdateDeleteData {
@@ -249,68 +248,5 @@ class Delete {
         _firestore.collection("Comments").doc(data).delete();
       });
     });
-  }
-
-  Future deleteUser({String currentUser}) async {
-    await _firestore
-        .collection("Blog")
-        .where("BlogOwnerId", isEqualTo: currentUser)
-        .snapshots()
-        .forEach((blogElement) {
-      //Finding blog uid then delete them
-      blogElement.docs.forEach((blog) {
-        String blogId = blog.data()["BlogUid"];
-        String blogPhotoUrl = blog.data()["BlogPhotoUrl"];
-        _firestore.collection("Blog").doc(blogId).delete();
-
-        _storage
-            .getReferenceFromUrl(blogPhotoUrl)
-            .then((value) => value.delete());
-
-        _firestore
-            .collection(
-                "Comments") //after getting blog uid deleting comment where blog uid same as ongoing deleting blog
-            .where("BlogUID", isEqualTo: blogId)
-            .snapshots()
-            .forEach((commentElement) {
-          commentElement.docs.forEach((comments) {
-            String data = comments.data()["CommentID"];
-
-            _firestore.collection("Comments").doc(data).delete();
-          });
-        });
-      });
-    });
-    print("Blog and Comments deleted");
-    await _firestore
-        .collection("Comments")
-        .where("CommentPersonID", isEqualTo: currentUser)
-        .snapshots()
-        .forEach((commentElement) {
-      print("Enter to user comments");
-      //delete user all comments
-      commentElement.docs.forEach((comments) {
-        String commentPersonId = comments.data()["CommentID"];
-        print("Starting deleting comments");
-        _firestore.collection("Comments").doc(commentPersonId).delete();
-        print("Comments deleted");
-      });
-    });
-    print("ALl comments deleted");
-    var userData = await _firestore.collection("Users").doc(currentUser).get();
-
-    String photoUrl = userData.data()["PhotoUrl"];
-    String coverUrl = userData.data()["CoverPhotoUrl"];
-    if (coverUrl != null)
-      await _storage
-          .getReferenceFromUrl(coverUrl)
-          .then((value) => value.delete());
-    await _storage
-        .getReferenceFromUrl(photoUrl)
-        .then((value) => value.delete());
-    await _firestore.collection("Users").doc(currentUser).delete();
-    print("User deleted from data base");
-    await firebaseAuth.currentUser.delete();
-    print("User data delete from auth");
   }
 }
