@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/screens/bottomAppBar.dart';
 import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
@@ -9,7 +8,6 @@ import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class BlogPost extends StatefulWidget {
@@ -259,6 +257,10 @@ class _BlogPostState extends State<BlogPost> {
     );
   }
 
+  FirebaseSetData fireBaseService = FirebaseSetData();
+  PhotoPicker photoPicker = PhotoPicker();
+
+  /// Handeling Radio Button Values
   void _handleRadioValueChange(int value) {
     setState(() {
       _radioValue = value;
@@ -284,7 +286,8 @@ class _BlogPostState extends State<BlogPost> {
     });
   }
 
-  PhotoPicker photoPicker = PhotoPicker();
+  /// Checking if any filed.isEmpty ? Drafting the blog : Publishing blog
+  /// Field mean all include image but  not radio it's default have a value of "FIX"
   bool checkAllFieldAreFullOrNot() {
     if (_titleTextController.text.isEmpty ||
         _detailTextController.text.isEmpty ||
@@ -295,26 +298,23 @@ class _BlogPostState extends State<BlogPost> {
     }
   }
 
+  ///Data Upload To firebaseFirestore
   dataUploadToFirebase() async {
+    ///whatBlog : Publish
     setState(() {
       _inAsyncCall = true;
     });
     try {
       Navigator.pop(context);
-      FirebaseSetData fireBaseService = FirebaseSetData();
-
-      blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
-          imageFile,
-          Provider.of<UserProvider>(context, listen: false).user,
-          blogId);
       fireBaseService
-          .updateBlogDataToFirebase(
-        blogTitle: blogTitle,
-        blogDetail: blogDetail,
+          .uploadBlog(
+        whatBlog: "Publish",
         blogUid: blogId,
-        timeStamp: timeStamp,
-        blogPhotoUrl: blogPhotoUrl,
+        blogDetail: blogDetail,
+        blogTitle: blogTitle,
+        fileImage: imageFile,
         blogType: _result,
+        timeStamp: timeStamp,
         userId: currentUserId,
       )
           .whenComplete(
@@ -334,26 +334,23 @@ class _BlogPostState extends State<BlogPost> {
     }
   }
 
+  ///Data Upload To firebaseFirestore as Draft Collection
   draftBlogDataToFirebase() async {
     setState(() {
       _inAsyncCall = true;
     });
 
-    FirebaseSetData fireBaseService = FirebaseSetData();
-    if (imageFile != null) {
-      blogPhotoUrl = await fireBaseService.uploadBlogPhotoToFireStorage(
-          imageFile, currentUserId, blogId);
-    }
-
-    fireBaseService
-        .saveBlogAsDraft(
-      blogDetail: blogDetail,
-      blogTitle: blogTitle,
-      blogPhotoUrl: blogPhotoUrl,
-      blogType: _result,
-      blogUid: blogId,
-      timeStamp: timeStamp,
+    /// whatBlog : Draft
+    await fireBaseService
+        .uploadBlog(
+      whatBlog: "Draft",
       userId: currentUserId,
+      timeStamp: timeStamp,
+      blogType: _result,
+      blogTitle: blogTitle,
+      blogDetail: blogDetail,
+      blogUid: blogId,
+      fileImage: imageFile,
     )
         .whenComplete(
       () {

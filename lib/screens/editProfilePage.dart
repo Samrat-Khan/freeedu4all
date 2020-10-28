@@ -19,51 +19,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String currentUserId;
   File fileImageOfDp, fileImageOfCover;
 
-  pickFileImageForDp() async {
-    PhotoPicker photoPicker = PhotoPicker();
-    fileImageOfDp = await photoPicker.pickImageFromGallery();
-  }
-
-  pickFileImageForCover() async {
-    PhotoPicker photoPicker = PhotoPicker();
-    fileImageOfCover = await photoPicker.pickImageFromGallery();
-  }
-
-  updateData() async {
-    FirebaseUpdateDeleteData firebaseServiceUpdateData =
-        FirebaseUpdateDeleteData();
-    await firebaseServiceUpdateData
-        .updateUserProfileData(
-      photoForDp: fileImageOfDp,
-      displayName: displayName,
-      bio: bio,
-      photoForCover: fileImageOfCover,
-      userId: currentUserId,
-    )
-        .whenComplete(() {
-      setState(() {
-        isUploading = false;
-        Navigator.pop(context);
-      });
-    });
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     currentUserId = firebaseAuth.currentUser.uid;
-  }
-
-  Future getUserData() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(currentUserId)
-        .get();
-    displayName = snapshot.data()["DisplayName"];
-    bio = snapshot.data()["About"];
-    photo = snapshot.data()["PhotoUrl"];
-    coverPhoto = snapshot.data()["CoverPhotoUrl"] ??= "";
   }
 
   bool isUploading = false;
@@ -229,5 +189,45 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ),
       ),
     );
+  }
+
+  pickFileImageForDp() async {
+    PhotoPicker photoPicker = PhotoPicker();
+    fileImageOfDp = await photoPicker.pickImageFromGallery();
+  }
+
+  pickFileImageForCover() async {
+    PhotoPicker photoPicker = PhotoPicker();
+    fileImageOfCover = await photoPicker.pickImageFromGallery();
+  }
+
+  updateData() async {
+    FirebaseUpdateDeleteData firebaseServiceUpdateData =
+        FirebaseUpdateDeleteData();
+    await firebaseServiceUpdateData
+        .updateUserProfileData(
+      photoForDp: fileImageOfDp,
+      displayName: displayName,
+      bio: bio,
+      photoForCover: fileImageOfCover,
+      userId: currentUserId,
+    )
+        .whenComplete(() {
+      setState(() {
+        isUploading = false;
+        Navigator.pop(context);
+      });
+    });
+  }
+
+  Future getUserData() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(currentUserId)
+        .get();
+    displayName = snapshot.data()["DisplayName"];
+    bio = snapshot.data()["About"];
+    photo = snapshot.data()["PhotoUrl"];
+    coverPhoto = snapshot.data()["CoverPhotoUrl"] ??= "";
   }
 }

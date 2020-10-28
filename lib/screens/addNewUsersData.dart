@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
+import 'bottomAppBar.dart';
+
 class AddNewUsersData extends StatefulWidget {
   final User user;
 
@@ -101,74 +103,6 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         ),
       ),
     );
-  }
-
-  PhotoPicker photoPicker = PhotoPicker();
-
-  imagePicFromGallery() async {
-    fileImage = await photoPicker.pickImageFromGallery();
-  }
-
-  checkTextFieldEmptyOrNot() {
-    if (_displayNameTextEditController.text.isEmpty == true ||
-        fileImage == null ||
-        _aboutUserTextEditController.text.isEmpty) {
-      setState(() {
-        isAllFieldEmpty = true;
-      });
-    } else {
-      setState(() {
-        isAllFieldEmpty = false;
-      });
-    }
-  }
-
-  uploadUserDataToFireStore() async {
-    checkTextFieldEmptyOrNot();
-    setState(() {
-      _inAsyncCall = true;
-    });
-    try {
-      FirebaseSetData fireBaseService = FirebaseSetData();
-
-      if (isAllFieldEmpty == true) {
-        final snackBar = SnackBar(
-          content: Text("Fields are empty"),
-        );
-        _key.currentState.showSnackBar(snackBar);
-        setState(() {
-          _inAsyncCall = false;
-        });
-      } else {
-        userPhotoUrl = await fireBaseService
-            .uploadUserProfilePhotoToFireStorage(fileImage, widget.user.uid);
-
-        fireBaseService
-            .updateUserDataToFirebase(
-          displayName: displayName,
-          aboutUser: aboutUser,
-          userEmail: widget.user.email,
-          photoUrl: userPhotoUrl,
-          uid: widget.user.uid,
-        )
-            .whenComplete(() {
-          Navigator.of(context).pushNamed(
-            "BottomAppBar",
-          );
-          setState(() {
-            _inAsyncCall = false;
-          });
-        });
-      }
-    } catch (e) {
-      final snackBar = SnackBar(
-        content: Text(e.message),
-      );
-      _key.currentState.showSnackBar(snackBar);
-      setState(() {
-        _inAsyncCall = false;
-      });
-    }
   }
 
   photoChooseContainer() {
@@ -267,5 +201,70 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         },
       ),
     );
+  }
+
+  PhotoPicker photoPicker = PhotoPicker();
+
+  imagePicFromGallery() async {
+    fileImage = await photoPicker.pickImageFromGallery();
+  }
+
+  checkTextFieldEmptyOrNot() {
+    if (_displayNameTextEditController.text.isEmpty == true ||
+        fileImage == null ||
+        _aboutUserTextEditController.text.isEmpty) {
+      setState(() {
+        isAllFieldEmpty = true;
+      });
+    } else {
+      setState(() {
+        isAllFieldEmpty = false;
+      });
+    }
+  }
+
+  FirebaseSetData fireBaseService = FirebaseSetData();
+  uploadUserDataToFireStore() async {
+    checkTextFieldEmptyOrNot();
+    setState(() {
+      _inAsyncCall = true;
+    });
+    try {
+      if (isAllFieldEmpty == true) {
+        final snackBar = SnackBar(
+          content: Text("Fields are empty"),
+        );
+        _key.currentState.showSnackBar(snackBar);
+        setState(() {
+          _inAsyncCall = false;
+        });
+      } else {
+        ///addNewUserData
+        fireBaseService
+            .addNewUserData(
+          fileImage: fileImage,
+          displayName: displayName,
+          aboutUser: aboutUser,
+          userEmail: widget.user.email,
+          userId: widget.user.uid,
+        )
+            .whenComplete(() {
+          Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => BottomNavigationAppBar()),
+              (route) => false);
+          setState(() {
+            _inAsyncCall = false;
+          });
+        });
+      }
+    } catch (e) {
+      final snackBar = SnackBar(
+        content: Text(e.message),
+      );
+      _key.currentState.showSnackBar(snackBar);
+      setState(() {
+        _inAsyncCall = false;
+      });
+    }
   }
 }

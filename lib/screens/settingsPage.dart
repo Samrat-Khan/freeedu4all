@@ -1,7 +1,5 @@
-import 'package:education_community/main.dart';
 import 'package:education_community/routes/routeDataPass.dart';
 import 'package:education_community/screens/loginPage.dart';
-import 'package:education_community/services/firebaseUpdataDeleteData.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +20,6 @@ class _SettingsPageState extends State<SettingsPage> {
     "Draft Blog",
     "Privacy",
     "About",
-    "Delete Account",
     "SignOut"
   ];
   List<IconData> _settingsOptionsIcon = [
@@ -30,52 +27,12 @@ class _SettingsPageState extends State<SettingsPage> {
     Icons.article_rounded,
     Icons.privacy_tip_sharp,
     Icons.info,
-    Icons.delete_forever_rounded,
     Icons.logout
   ];
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
 
   draftPost() {
     Navigator.pushNamed(context, "DraftPost");
-  }
-
-  Delete _delete = Delete();
-  deleteAccount({BuildContext context}) async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text("Are you sure ?"),
-            actions: [
-              FlatButton(
-                  onPressed: () => Navigator.pop(context), child: Text("No")),
-              FlatButton(
-                  onPressed: () async {
-                    setState(() {
-                      _inAsyncCall = true;
-                    });
-                    try {
-                      await _delete
-                          .deleteUser(currentUser: currentUserId)
-                          .whenComplete(() {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => MyApp()),
-                            (route) => false);
-                        print("User data delete success");
-                        setState(() {
-                          _inAsyncCall = false;
-                        });
-                      });
-                    } catch (e) {
-                      print(
-                          "En error occurs during user data deleting ${e.message}");
-                    }
-                  },
-                  child: Text("Yes")),
-            ],
-          );
-        });
   }
 
   readPrivacy() {
@@ -154,9 +111,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         return readPrivacy();
                       case 3:
                         return readAbout();
+
                       case 4:
-                        return deleteAccount(context: context);
-                      case 5:
                         return logOut();
                     }
                   },

@@ -152,7 +152,7 @@ class _BlogEditPageState extends State<BlogEditPage> {
                   child: TextField(
                     controller: _detailController,
                     maxLines: 10,
-                    maxLength: 180,
+                    maxLength: 10000,
                     decoration: InputDecoration(
                       hintText: "Blog Detail",
                       labelText: "Blog Detail",
@@ -283,7 +283,6 @@ class _BlogEditPageState extends State<BlogEditPage> {
       fileImage: fileImage,
       userId: currentUserId,
       blogType: _result,
-      uploadedPhotoUrl: widget.blogPhoto,
     )
         .whenComplete(() {
       Navigator.pop(context);

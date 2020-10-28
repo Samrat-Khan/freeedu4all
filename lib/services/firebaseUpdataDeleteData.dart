@@ -14,6 +14,15 @@ class FirebaseUpdateDeleteData {
   MonthFormat monthFormat = MonthFormat();
   FirebaseSetData firebaseSetData = FirebaseSetData();
 
+  Future handelBookmark(
+      {String blogUid, String currentUserID, bool isBookmarkChecked}) async {
+    await firebaseFirestore.collection("Blog").doc(blogUid).update(
+      {
+        'Bookmark.$currentUserID': isBookmarkChecked,
+      },
+    );
+  }
+
   Future handelLikes(
       {String blogUid, int count, String currentUserID, bool isLiked}) async {
     await firebaseFirestore.collection("Blog").doc(blogUid).update(
@@ -22,6 +31,26 @@ class FirebaseUpdateDeleteData {
         'Likes.$currentUserID': isLiked,
       },
     );
+  }
+
+  ///WhatImage also define where fileImage will be upload on Firebase Storage
+  ///If it BlogImage => BlogImage/UserId/BlogUid.jpg
+  ///UserImage => UserImage/UserId/UserId.jpg
+  ///CoverImage => CoverImage/UserId/UserId.jpg
+
+  Future<String> photoUpload(
+      {String whatImage, String userId, String blogUid, File fileImage}) async {
+    final StorageReference reference =
+        firebaseStorage.ref().child(whatImage == "UserImage"
+            ? "$whatImage/$userId/$userId.jpg"
+            : whatImage == "BlogImage"
+                ? "$whatImage/$userId/$blogUid.jpg"
+                : "$whatImage/$userId/$userId.jpg");
+
+    final StorageUploadTask task = reference.putFile(fileImage);
+    await task.onComplete;
+    uploadPhotoLink = await reference.getDownloadURL();
+    return uploadPhotoLink;
   }
 
   Future updateUserProfileData(
@@ -34,10 +63,13 @@ class FirebaseUpdateDeleteData {
     String coverPhotoUrl;
     if (photoForDp != null) {
       if (photoForCover != null) {
-        String dpPhotoUrl =
-            await updateUserProfilePhotoToFireStorage(photoForDp, userId);
-        coverPhotoUrl =
-            await updateUserCoverPhotoToFireStorage(photoForCover, userId);
+        String dpPhotoUrl = await photoUpload(
+            whatImage: "UserImage", fileImage: photoForDp, userId: userId);
+        coverPhotoUrl = await photoUpload(
+          whatImage: "CoverImage",
+          userId: userId,
+          fileImage: photoForCover,
+        );
         await firebaseFirestore.collection("Users").doc(userUniqueId).update(
           {
             "PhotoUrl": dpPhotoUrl,
@@ -47,8 +79,8 @@ class FirebaseUpdateDeleteData {
           },
         );
       } else {
-        String dpPhotoUrl =
-            await updateUserProfilePhotoToFireStorage(photoForDp, userId);
+        String dpPhotoUrl = await photoUpload(
+            whatImage: "UserImage", fileImage: photoForDp, userId: userId);
         await firebaseFirestore.collection("Users").doc(userUniqueId).update(
           {
             "PhotoUrl": dpPhotoUrl,
@@ -59,8 +91,11 @@ class FirebaseUpdateDeleteData {
       }
     } else {
       if (photoForCover != null) {
-        coverPhotoUrl =
-            await updateUserCoverPhotoToFireStorage(photoForCover, userId);
+        coverPhotoUrl = await photoUpload(
+          whatImage: "CoverImage",
+          userId: userId,
+          fileImage: photoForCover,
+        );
         await firebaseFirestore.collection("Users").doc(userUniqueId).update(
           {
             "CoverPhotoUrl": coverPhotoUrl,
@@ -81,36 +116,22 @@ class FirebaseUpdateDeleteData {
 
   Future<String> updateUserProfilePhotoToFireStorage(
       File fileImage, String userId) async {
-    String userUniqueId = userId;
-    final StorageReference storageReference = firebaseStorage
-        .ref()
-        .child("UserImage/$userUniqueId/$userUniqueId.jpg");
-    final StorageUploadTask uploadTask = storageReference.putFile(fileImage);
-    await uploadTask.onComplete;
-    uploadPhotoLink = await storageReference.getDownloadURL();
+    String uploadPhotoLink = await photoUpload(
+      whatImage: "UserImage",
+      userId: userId,
+      fileImage: fileImage,
+    );
     return uploadPhotoLink;
   }
 
   Future<String> updateUserCoverPhotoToFireStorage(
       File fileImage, String userId) async {
-    String userUniqueId = userId;
-    final StorageReference storageReference = firebaseStorage
-        .ref()
-        .child("CoverImage/$userUniqueId/$userUniqueId.jpg");
-    final StorageUploadTask uploadTask = storageReference.putFile(fileImage);
-    await uploadTask.onComplete;
-    uploadPhotoLink = await storageReference.getDownloadURL();
+    String uploadPhotoLink = await photoUpload(
+        whatImage: "CoverImage", userId: userId, fileImage: fileImage);
     return uploadPhotoLink;
   }
 
-  Future handelBookmark(
-      {String blogUid, String currentUserID, bool isBookmarkChecked}) async {
-    await firebaseFirestore.collection("Blog").doc(blogUid).update(
-      {
-        'Bookmark.$currentUserID': isBookmarkChecked,
-      },
-    );
-  }
+  ///edit Publish BlogData
 
   Future updatePublishPost(
       {File fileImage,
@@ -120,11 +141,12 @@ class FirebaseUpdateDeleteData {
       String userId}) async {
     String photoUrl;
     if (fileImage != null) {
-      final StorageReference storageReference =
-          firebaseStorage.ref().child("PostImage/$userId/$blogUid.jpg");
-      final StorageUploadTask uploadTask = storageReference.putFile(fileImage);
-      await uploadTask.onComplete;
-      photoUrl = await storageReference.getDownloadURL();
+      photoUrl = await photoUpload(
+        userId: userId,
+        whatImage: "BlogImage",
+        blogUid: blogUid,
+        fileImage: fileImage,
+      );
       firebaseFirestore.collection("Blog").doc(blogUid).update({
         "BlogTitle": blogTitle,
         "BlogDetail": blogDetail,
@@ -138,6 +160,7 @@ class FirebaseUpdateDeleteData {
     }
   }
 
+  ///edit Draft blogData
   Future draftPostUpdate(
       {File fileImage,
       String blogTitle,
@@ -147,11 +170,12 @@ class FirebaseUpdateDeleteData {
     String photoUrl;
     String month = monthFormat.getMonth(currentDateTime.month);
     if (fileImage != null) {
-      final StorageReference storageReference =
-          firebaseStorage.ref().child("PostImage/$userId/$blogUid.jpg");
-      final StorageUploadTask uploadTask = storageReference.putFile(fileImage);
-      await uploadTask.onComplete;
-      photoUrl = await storageReference.getDownloadURL();
+      photoUrl = await photoUpload(
+        userId: userId,
+        whatImage: "BlogImage",
+        blogUid: blogUid,
+        fileImage: fileImage,
+      );
       firebaseFirestore.collection("DraftBlog").doc(blogUid).update({
         "BlogTitle": blogTitle,
         "BlogDetail": blogDetail,
@@ -169,29 +193,24 @@ class FirebaseUpdateDeleteData {
     }
   }
 
+  ///publish Draft Blog
   Future publishDraftBlog(
       {File fileImage,
       String blogTitle,
       String blogDetail,
       String blogUid,
       String userId,
-      String blogType,
-      String uploadedPhotoUrl}) async {
-    final StorageReference storageReference =
-        firebaseStorage.ref().child("PostImage/$userId/$blogUid.jpg");
-    final StorageUploadTask uploadTask = storageReference.putFile(fileImage);
-    await uploadTask.onComplete;
-    uploadedPhotoUrl = await storageReference.getDownloadURL();
+      String blogType}) async {
     await firebaseSetData
-        .updateBlogDataToFirebase(
-      blogTitle: blogTitle,
-      blogDetail: blogDetail,
-      blogUid: blogUid,
-      blogPhotoUrl: uploadedPhotoUrl,
-      timeStamp: currentDateTime.microsecondsSinceEpoch,
-      userId: userId,
-      blogType: blogType,
-    )
+        .uploadBlog(
+            blogTitle: blogTitle,
+            blogDetail: blogDetail,
+            blogUid: blogUid,
+            fileImage: fileImage,
+            timeStamp: currentDateTime.microsecondsSinceEpoch,
+            userId: userId,
+            blogType: blogType,
+            whatBlog: "Publish")
         .whenComplete(() {
       firebaseFirestore.collection("DraftBlog").doc(blogUid).delete();
     });

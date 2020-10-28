@@ -26,16 +26,16 @@ class FirebaseSetData {
   }
 
   ///WhatImage also define where fileImage will be upload on Firebase Storage
-  ///If it PostImage => PostImage/UserId/BlogUid.jpg
+  ///If it BlogImage => BlogImage/UserId/BlogUid.jpg
   ///UserImage => UserImage/UserId/UserId.jpg
   ///CoverImage => CoverImage/UserId/UserId.jpg
 
-  Future<String> photoUploadCommon(
+  Future<String> photoUpload(
       {String whatImage, String userId, String blogUid, File fileImage}) async {
     final StorageReference reference =
         firebaseStorage.ref().child(whatImage == "UserImage"
             ? "$whatImage/$userId/$userId.jpg"
-            : whatImage == "PostImage"
+            : whatImage == "BlogImage"
                 ? "$whatImage/$userId/$blogUid.jpg"
                 : "$whatImage/$userId/$userId.jpg");
 
@@ -52,35 +52,27 @@ class FirebaseSetData {
     String blogTitle,
     String blogUid,
     String blogType,
-    String blogSubType,
     String blogDetail,
     String userId,
     int timeStamp,
     File fileImage,
   }) async {
-    ///
     String month = monthFormat.getMonth(currentDateTime.month);
 
-    ///
     DocumentSnapshot variable =
         await FirebaseFirestore.instance.collection('Users').doc(userId).get();
 
-    ///
     String blogPhotoUrl;
 
-    ///
     if (whatBlog == "Publish") {
-      //
-      blogPhotoUrl = await photoUploadCommon(
-          whatImage: "PostImage",
+      blogPhotoUrl = await photoUpload(
+          whatImage: "BlogImage",
           userId: userId,
           blogUid: blogUid,
           fileImage: fileImage);
 
-      ///
       CollectionReference blogData = firebaseFirestore.collection("Blog");
 
-      ///
       await blogData.doc(blogUid).set({
         "BlogOwnerId": userId,
         "BlogOwnerName": variable.data()["DisplayName"],
@@ -88,7 +80,6 @@ class FirebaseSetData {
         "BlogTitle": blogTitle,
         "BlogDetail": blogDetail,
         "BlogType": blogType,
-        "BlogSubType": blogSubType,
         "BlogPhotoUrl": blogPhotoUrl,
         "BlogUid": blogUid,
         "TimeStamp": timeStamp,
@@ -97,17 +88,14 @@ class FirebaseSetData {
         "Likes": {},
         "Bookmark": {},
       });
-      //
-    }
-    //
-    else {
+    } else {
       //
       CollectionReference draftBlog = firebaseFirestore.collection("DraftBlog");
       //
       if (fileImage != null) {
         //
-        blogPhotoUrl = await photoUploadCommon(
-            whatImage: "PostImage",
+        blogPhotoUrl = await photoUpload(
+            whatImage: "BlogImage",
             userId: userId,
             blogUid: blogUid,
             fileImage: fileImage);
@@ -129,6 +117,27 @@ class FirebaseSetData {
     //
   }
 
+  Future addNewUserData(
+      {File fileImage,
+      String userId,
+      String displayName,
+      String userEmail,
+      String aboutUser}) async {
+    ///whatImage : UserImage
+    CollectionReference userData = firebaseFirestore.collection("Users");
+    String photoUrl = await photoUpload(
+        whatImage: "UserImage", fileImage: fileImage, userId: userId);
+    await userData.doc(userId).set({
+      "DisplayName": displayName,
+      "Email": userEmail,
+      "About": aboutUser,
+      "PhotoUrl": photoUrl,
+      "UserUID": userId,
+      "Time": currentDateTime.millisecondsSinceEpoch,
+    });
+  }
+
+  ///End Here  Above
   Future updateUserDataToFirebase({
     String displayName,
     String photoUrl,
@@ -148,78 +157,12 @@ class FirebaseSetData {
     });
   }
 
-  Future<String> uploadBlogPhotoToFireStorage(
-      File fileImage, String userUniqueId, String blogUniqueId) async {
-    final StorageReference storageReference = firebaseStorage
-        .ref()
-        .child("PostImage/$userUniqueId/$blogUniqueId.jpg");
-    final StorageUploadTask uploadTask = storageReference.putFile(fileImage);
-    await uploadTask.onComplete;
-    uploadPhotoLink = await storageReference.getDownloadURL();
-    return uploadPhotoLink;
-  }
-
-  Future updateBlogDataToFirebase({
-    String blogTitle,
-    String blogPhotoUrl,
-    String blogUid,
-    String blogType,
-    String blogDetail,
-    String userId,
-    int timeStamp,
-  }) async {
-    String month = monthFormat.getMonth(currentDateTime.month);
-
-    DocumentSnapshot variable =
-        await FirebaseFirestore.instance.collection('Users').doc(userId).get();
-    CollectionReference blogData = firebaseFirestore.collection("Blog");
-
-    await blogData.doc(blogUid).set({
-      "BlogOwnerId": userId,
-      "BlogOwnerName": variable.data()["DisplayName"],
-      "BlogOwnerPhotoUrl": variable.data()["PhotoUrl"],
-      "BlogTitle": blogTitle,
-      "BlogDetail": blogDetail,
-      "BlogType": blogType,
-      "BlogPhotoUrl": blogPhotoUrl,
-      "BlogUid": blogUid,
-      "TimeStamp": timeStamp,
-      "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
-      "TotalLikes": 0,
-      "Likes": {},
-      "Bookmark": {},
-    });
-  }
-
   Future blogAuthorDetail(String id) async {
     String name;
     DocumentSnapshot variable =
         await FirebaseFirestore.instance.collection('Users').doc(id).get();
     name = variable.data()["PhotoUrl"];
     return name;
-  }
-
-  Future saveBlogAsDraft({
-    String blogTitle,
-    String blogPhotoUrl,
-    String blogUid,
-    String blogType,
-    String blogDetail,
-    String userId,
-    int timeStamp,
-  }) async {
-    String month = monthFormat.getMonth(currentDateTime.month);
-    CollectionReference draftBlog = firebaseFirestore.collection("DraftBlog");
-    await draftBlog.doc(blogUid).set({
-      "BlogOwnerId": userId,
-      "BlogTitle": blogTitle,
-      "BlogDetail": blogDetail,
-      "BlogType": blogType,
-      "BlogPhotoUrl": blogPhotoUrl,
-      "BlogUid": blogUid,
-      "TimeStamp": timeStamp,
-      "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
-    });
   }
 
   Future addCommentToBlog({
