@@ -1,6 +1,6 @@
 # Article Sharing Platform
 ___
-
+## This app is not complete yet
 ### To contribute, please follow below rules :- 
 * **Star this repo.**
 * Before adding new feature please open a **new discussion**
