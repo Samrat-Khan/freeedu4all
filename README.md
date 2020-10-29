@@ -4,6 +4,17 @@ ___
 ### To contribute, please follow below rules :- 
 * **Star this repo.**
 * Before adding new feature please open a **new discussion**
+
+* ### Before run this app follow this steps :
+    - Create an account in Firebase if not exist
+    - add new Project
+    - set Project Name
+    - goto next then next
+    - now from firebase dashboad select android
+    - fill the  details package name you will from projectDirectory -> android ->  app -> src -> main -> AndroidManifest.xml
+    - add all the dependecy and build you project make sure you setup sign-in-method (Email Sign In) from firebase auth tab
+    - then run pub get and run
+
 * Contribute to this project 
     - Fork the repository (Click the Fork button in the top right of this page, click your Profile Image)
     - Clone the forked repository to your local machine.
