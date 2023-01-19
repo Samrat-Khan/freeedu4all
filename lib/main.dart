@@ -1,3 +1,4 @@
+import 'package:education_community/firebase_options.dart';
 import 'package:education_community/providerServices/authUserProvider.dart';
 import 'package:education_community/providerServices/darkTheme.dart';
 import 'package:education_community/routes/routeGenerator.dart';
@@ -8,7 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await SharedPreferences.getInstance();
   runApp(
     MultiProvider(

@@ -70,9 +70,10 @@ class _CommentPageState extends State<CommentPage> {
             return Text("No Comments Yet");
           }
           return ListView.builder(
-            itemCount: snapshot.data.documents.length,
+            itemCount: snapshot.data.docs.length,
             itemBuilder: (context, index) {
-              DocumentSnapshot ds = snapshot.data.documents[index];
+              DocumentSnapshot<Map<String, dynamic>> ds =
+                  snapshot.data.docs[index];
               return Container(
                 child: ListTile(
                   leading: ClipRRect(

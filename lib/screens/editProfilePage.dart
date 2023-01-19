@@ -7,7 +7,7 @@ import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class EditProfilePage extends StatefulWidget {
   @override
@@ -221,7 +221,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future getUserData() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
         .collection("Users")
         .doc(currentUserId)
         .get();

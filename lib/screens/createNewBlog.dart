@@ -7,7 +7,7 @@ import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:uuid/uuid.dart';
 
 class BlogPost extends StatefulWidget {
@@ -119,14 +119,18 @@ class _BlogPostState extends State<BlogPost> {
                       )
                     : null,
                 actions: [
-                  FlatButton.icon(
-                    color: Colors.black,
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                    ),
                     onPressed: fieldIsEmpty ? null : dataUploadToFirebase,
                     label: Text("Upload"),
                     icon: Icon(Icons.upload_outlined),
                   ),
-                  FlatButton.icon(
-                    color: Colors.black,
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                    ),
                     onPressed: draftBlogDataToFirebase,
                     label: Text("Save As Draft"),
                     icon: Icon(Icons.drafts_outlined),

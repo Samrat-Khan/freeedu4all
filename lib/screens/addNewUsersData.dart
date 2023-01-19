@@ -5,7 +5,7 @@ import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 import 'bottomAppBar.dart';
 
@@ -40,10 +40,9 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _displayNameTextEditController.dispose();
     _aboutUserTextEditController.dispose();
+    super.dispose();
   }
 
   bool _inAsyncCall = false;
@@ -234,7 +233,8 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         final snackBar = SnackBar(
           content: Text("Fields are empty"),
         );
-        _key.currentState.showSnackBar(snackBar);
+        // _key.currentState.showSnackBar(snackBar);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         setState(() {
           _inAsyncCall = false;
         });
@@ -261,7 +261,8 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
       final snackBar = SnackBar(
         content: Text(e.message),
       );
-      _key.currentState.showSnackBar(snackBar);
+      // _key.currentState.showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       setState(() {
         _inAsyncCall = false;
       });

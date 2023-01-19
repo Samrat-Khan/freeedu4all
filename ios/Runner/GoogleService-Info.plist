@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>870940068476-tbfa265bfhphaa7jnt8r54t89ksd1v4h.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.870940068476-tbfa265bfhphaa7jnt8r54t89ksd1v4h</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>870940068476-9gs8a82lc24ebuo5695pev5qpgu1kc6h.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAQiN58AGa2288-ZX7Dai4fbsySD4819E8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>870940068476</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.delit.educationCommunity</string>
+	<key>PROJECT_ID</key>
+	<string>educommunity-delit</string>
+	<key>STORAGE_BUCKET</key>
+	<string>educommunity-delit.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:870940068476:ios:5ff02f156964e3494597f9</string>
+	<key>DATABASE_URL</key>
+	<string>https://educommunity-delit.firebaseio.com</string>
+</dict>
+</plist>

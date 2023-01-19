@@ -15,22 +15,23 @@ dependencies:
     sdk: flutter
 
 
-  cupertino_icons: ^1.0.0
+  cupertino_icons: ^1.0.5
 
-  firebase_core: ^0.5.0
-  firebase_auth: ^0.18.0+1
-  firebase_storage: ^4.0.0
-  google_sign_in: ^4.5.3
-  provider: ^4.3.2+2
-  shared_preferences: ^0.5.12
-  cloud_firestore: ^0.14.0+2
-  uuid: ^2.2.2
-  image_picker: ^0.6.7+11
-  modal_progress_hud: ^0.1.3
+  firebase_core: ^2.4.1
+  firebase_auth: ^4.2.4
+  firebase_storage: ^11.0.10
+  google_sign_in: ^5.4.2
+  provider: ^6.0.5
+  shared_preferences: ^2.0.15
+  cloud_firestore: ^4.3.1
+  uuid: ^3.0.7
+  image_picker: ^0.8.6
+  modal_progress_hud_nsn: ^0.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  package_rename: ^1.0.0+1
 
 
 flutter:
@@ -57,3 +58,12 @@ flutter:
         - asset: fonts/Pacifico.ttf
 
 
+package_rename_config:
+  android:
+    app_name: freeEdu4All # (String) The display name of the android app
+    package_name:  com.delit.freeEdu4All # (String) The package name of the android app
+
+  ios:
+    app_name: freeEdu4All # (String) The display name of the ios app
+    bundle_name: com.delit.freeEdu4All  # (String) The bundle name of the ios app
+    package_name: com.delit.freeEdu4All 

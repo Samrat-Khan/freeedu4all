@@ -7,7 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'timeCalCulations.dart';
 
 class FirebaseSetData {
-  FirebaseStorage firebaseStorage = FirebaseStorage();
+  FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   String uploadPhotoLink;
   var currentDateTime = DateTime.now();
@@ -15,11 +15,12 @@ class FirebaseSetData {
 
   Future<String> uploadUserProfilePhotoToFireStorage(
       File fileImage, String userUniqueId) async {
-    final StorageReference storageReference = firebaseStorage
+    final Reference storageReference = firebaseStorage
         .ref()
         .child("UserImage/$userUniqueId/$userUniqueId.jpg");
-    final StorageUploadTask uploadTask = storageReference.putFile(fileImage);
-    await uploadTask.onComplete;
+    // final UploadTask uploadTask =
+    await storageReference.putFile(fileImage);
+    // await uploadTask.onComplete;
     uploadPhotoLink = await storageReference.getDownloadURL();
 
     return uploadPhotoLink;
@@ -32,15 +33,16 @@ class FirebaseSetData {
 
   Future<String> photoUpload(
       {String whatImage, String userId, String blogUid, File fileImage}) async {
-    final StorageReference reference =
+    final Reference reference =
         firebaseStorage.ref().child(whatImage == "UserImage"
             ? "$whatImage/$userId/$userId.jpg"
             : whatImage == "BlogImage"
                 ? "$whatImage/$userId/$blogUid.jpg"
                 : "$whatImage/$userId/$userId.jpg");
 
-    final StorageUploadTask task = reference.putFile(fileImage);
-    await task.onComplete;
+    // final UploadTask task =
+    await reference.putFile(fileImage);
+    // await task.onComplete;
     uploadPhotoLink = await reference.getDownloadURL();
     return uploadPhotoLink;
   }
@@ -59,7 +61,7 @@ class FirebaseSetData {
   }) async {
     String month = monthFormat.getMonth(currentDateTime.month);
 
-    DocumentSnapshot variable =
+    DocumentSnapshot<Map<String, dynamic>> variable =
         await FirebaseFirestore.instance.collection('Users').doc(userId).get();
 
     String blogPhotoUrl;
@@ -159,7 +161,7 @@ class FirebaseSetData {
 
   Future blogAuthorDetail(String id) async {
     String name;
-    DocumentSnapshot variable =
+    DocumentSnapshot<Map<String, dynamic>> variable =
         await FirebaseFirestore.instance.collection('Users').doc(id).get();
     name = variable.data()["PhotoUrl"];
     return name;
@@ -176,7 +178,7 @@ class FirebaseSetData {
     int timeStamp = currentDateTime.microsecondsSinceEpoch;
     String month = monthFormat.getMonth(currentDateTime.month);
     CollectionReference addComment = firebaseFirestore.collection("Comments");
-    DocumentSnapshot variable =
+    DocumentSnapshot<Map<String, dynamic>> variable =
         await FirebaseFirestore.instance.collection('Users').doc(userId).get();
     await addComment.doc(commentID).set({
       "CommentUserName": variable.data()["DisplayName"],

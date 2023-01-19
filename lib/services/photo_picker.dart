@@ -7,7 +7,7 @@ class PhotoPicker {
   ImagePicker picker = ImagePicker();
   Future pickImageFromGallery() async {
     final pickedFile =
-        await picker.getImage(source: ImageSource.gallery, imageQuality: 45);
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 45);
     _image = File(pickedFile.path);
     return _image;
   }

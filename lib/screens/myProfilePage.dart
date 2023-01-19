@@ -211,9 +211,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
     return SliverList(
       delegate: SliverChildListDelegate(
         List.generate(
-          snapshot.data.documents.length,
+          snapshot.data.docs.length,
           (index) {
-            DocumentSnapshot ds = snapshot.data.documents[index];
+            DocumentSnapshot<Map<String, dynamic>> ds =
+                snapshot.data.docs[index];
 
             return Container(
               padding: EdgeInsets.all(10),

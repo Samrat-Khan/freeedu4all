@@ -5,7 +5,7 @@ import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class BlogEditPage extends StatefulWidget {
   final String blogUid, blogTitle, blogDetail, blogPhoto, blogType;
@@ -40,10 +40,10 @@ class _BlogEditPageState extends State<BlogEditPage> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    super.dispose();
     _titleController.dispose();
     _detailController.dispose();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -166,7 +166,7 @@ class _BlogEditPageState extends State<BlogEditPage> {
                   ),
                 ),
                 widget.blogType != "Draft"
-                    ? RaisedButton(
+                    ? ElevatedButton(
                         child: Text(
                           "Update",
                           style: TextStyle(color: Colors.white),
@@ -176,14 +176,14 @@ class _BlogEditPageState extends State<BlogEditPage> {
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          RaisedButton(
+                          ElevatedButton(
                             child: Text(
                               "Update Draft",
                               style: TextStyle(color: Colors.white),
                             ),
                             onPressed: updateDraftBlog,
                           ),
-                          RaisedButton(
+                          ElevatedButton(
                             child: Text(
                               "Publish",
                               style: TextStyle(color: Colors.white),

@@ -42,7 +42,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
           if (!snapshot.hasData) {
             return Text("Loading....");
           }
-          DocumentSnapshot ds = snapshot.data;
+          DocumentSnapshot<Map<String, dynamic>> ds = snapshot.data;
 
           _isLiked = ds.data()["Likes"][currentUserId] ??= false;
           min = microToMin.minConvert(ds.data()["TimeStamp"]);
@@ -88,7 +88,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
 
   FirebaseUpdateDeleteData _firebaseServiceUpdateData =
       FirebaseUpdateDeleteData();
-  Future handelLike(DocumentSnapshot ds) async {
+  Future handelLike(DocumentSnapshot<Map<String, dynamic>> ds) async {
     _isLiked = ds.data()["Likes"][currentUserId] == true;
     if (_isLiked == true) {
       setState(() {
@@ -116,7 +116,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
     }
   }
 
-  Future handelBookmark(DocumentSnapshot ds) async {
+  Future handelBookmark(DocumentSnapshot<Map<String, dynamic>> ds) async {
     _isBookmarkChecked = ds.data()["Bookmark"][currentUserId] == true;
     if (_isBookmarkChecked) {
       setState(() {
@@ -192,7 +192,7 @@ class _BlogReadingPageState extends State<BlogReadingPage> {
     );
   }
 
-  SliverAppBar sliverAppBar(DocumentSnapshot ds) {
+  SliverAppBar sliverAppBar(DocumentSnapshot<Map<String, dynamic>> ds) {
     return SliverAppBar(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.only(

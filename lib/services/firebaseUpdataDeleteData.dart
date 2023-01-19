@@ -6,7 +6,7 @@ import 'package:education_community/services/timeCalCulations.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseUpdateDeleteData {
-  FirebaseStorage firebaseStorage = FirebaseStorage();
+  FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   String uploadPhotoLink;
   var currentDateTime = DateTime.now();
@@ -39,15 +39,16 @@ class FirebaseUpdateDeleteData {
 
   Future<String> photoUpload(
       {String whatImage, String userId, String blogUid, File fileImage}) async {
-    final StorageReference reference =
+    final Reference reference =
         firebaseStorage.ref().child(whatImage == "UserImage"
             ? "$whatImage/$userId/$userId.jpg"
             : whatImage == "BlogImage"
                 ? "$whatImage/$userId/$blogUid.jpg"
                 : "$whatImage/$userId/$userId.jpg");
 
-    final StorageUploadTask task = reference.putFile(fileImage);
-    await task.onComplete;
+    // final UploadTask task =
+    await reference.putFile(fileImage);
+    // await task.onComplete;
     uploadPhotoLink = await reference.getDownloadURL();
     return uploadPhotoLink;
   }
@@ -223,9 +224,8 @@ class Delete {
       {String blogUid, String currentUserId, String blogPhotoUrl}) async {
     await _firestore.collection("DraftBlog").doc(blogUid).delete();
     if (blogPhotoUrl != null) {
-      await _storage
-          .getReferenceFromUrl(blogPhotoUrl)
-          .then((value) => value.delete());
+      Reference ref = _storage.refFromURL(blogPhotoUrl);
+      ref.delete();
     }
   }
 
@@ -233,9 +233,8 @@ class Delete {
       {String blogUid, String currentUserId, String blogPhotoUrl}) async {
     await _firestore.collection("Blog").doc(blogUid).delete();
     if (blogPhotoUrl != null) {
-      await _storage
-          .getReferenceFromUrl(blogPhotoUrl)
-          .then((value) => value.delete());
+      Reference ref = _storage.refFromURL(blogPhotoUrl);
+      ref.delete();
     }
 
     await _firestore

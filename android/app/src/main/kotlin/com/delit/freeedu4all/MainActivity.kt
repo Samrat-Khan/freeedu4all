@@ -1,4 +1,4 @@
-package com.delit.education_community
+package com.delit.freeEdu4All
 
 import io.flutter.embedding.android.FlutterActivity
 

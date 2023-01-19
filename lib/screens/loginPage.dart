@@ -6,7 +6,7 @@ import 'package:education_community/widgets/textStyle.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:provider/provider.dart';
 
 import 'HomePage.dart';
@@ -177,9 +177,11 @@ class _LogInPageState extends State<LogInPage> {
               ),
             ),
           ),
-          RaisedButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
             ),
             child: Text(
               "log In",
@@ -283,9 +285,11 @@ class _LogInPageState extends State<LogInPage> {
               ),
             ),
           ),
-          RaisedButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5),
+              ),
             ),
             child: Text(
               "Sign Up",
@@ -342,7 +346,7 @@ class _LogInPageState extends State<LogInPage> {
           _passwordForExistUser.clear();
           final snackbar =
               SnackBar(content: Text("Please Check Your Email Or Password"));
-          _key.currentState.showSnackBar(snackbar);
+          ScaffoldMessenger.of(context).showSnackBar(snackbar);
           setState(() {
             _inAsyncCall = false;
           });
@@ -369,7 +373,7 @@ class _LogInPageState extends State<LogInPage> {
     } catch (e) {
       final snackBar =
           SnackBar(content: Text("Please Check Your Email Or Password"));
-      _key.currentState.showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       setState(() {
         _inAsyncCall = false;
       });
@@ -390,7 +394,7 @@ class _LogInPageState extends State<LogInPage> {
           final snackBar = SnackBar(
               content: Text(
                   "The email has already been registered. Please login or reset your password."));
-          _key.currentState.showSnackBar(snackBar);
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
           setState(
             () {
               _inAsyncCall = false;
@@ -409,7 +413,7 @@ class _LogInPageState extends State<LogInPage> {
       final snackBar = SnackBar(
           content: Text(
               "The email has already been registered. Please login or reset your password."));
-      _key.currentState.showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
       setState(() {
         _inAsyncCall = false;
       });
@@ -507,7 +511,7 @@ class ForgotPassword extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Text(
                       "Send",
                       style: TextStyle(color: Colors.white),
@@ -529,14 +533,14 @@ class ForgotPassword extends StatelessWidget {
       await _emailAuth.forgotPassword(email: _controller.text).whenComplete(() {
         final snackBar =
             SnackBar(content: Text("Check Your Email, we've send a link"));
-        _key.currentState.showSnackBar(snackBar);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Future.delayed(Duration(seconds: 3))
             .then((value) => Navigator.of(context).pop());
       });
     } catch (e) {
       final snackBar = SnackBar(
           content: Text("An Unexpected error occurs, please try again later"));
-      _key.currentState.showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 }

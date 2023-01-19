@@ -32,7 +32,7 @@ class _HomepageState extends State<Homepage> {
               .collection("Blog")
               .orderBy("TimeStamp", descending: true)
               .snapshots(),
-          builder: (context, snapshot) {
+          builder: (context, AsyncSnapshot snapshot) {
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
             }
@@ -40,9 +40,9 @@ class _HomepageState extends State<Homepage> {
               return Center(child: CircularProgressIndicator());
             } else
               return ListView.builder(
-                itemCount: snapshot.data.documents.length,
+                itemCount: snapshot.data.docs.length,
                 itemBuilder: (context, index) {
-                  DocumentSnapshot ds = snapshot.data.documents[index];
+                  DocumentSnapshot ds = snapshot.data.docs[index];
                   return ArticleOverView(ds: ds);
                 },
               );
@@ -59,7 +59,7 @@ class ArticleOverView extends StatelessWidget {
     @required this.ds,
   }) : super(key: key);
 
-  final DocumentSnapshot ds;
+  final DocumentSnapshot<Map<String, dynamic>> ds;
 
   @override
   Widget build(BuildContext context) {
