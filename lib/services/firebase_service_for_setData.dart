@@ -94,16 +94,14 @@ class FirebaseSetData {
       //
       CollectionReference draftBlog = firebaseFirestore.collection("DraftBlog");
       //
-      if (fileImage != null) {
-        //
-        blogPhotoUrl = await photoUpload(
-            whatImage: "BlogImage",
-            userId: userId,
-            blogUid: blogUid,
-            fileImage: fileImage);
-        //
-      }
       //
+      blogPhotoUrl = await photoUpload(
+          whatImage: "BlogImage",
+          userId: userId,
+          blogUid: blogUid,
+          fileImage: fileImage);
+      //
+          //
       await draftBlog.doc(blogUid).set({
         "BlogOwnerId": userId,
         "BlogTitle": blogTitle,

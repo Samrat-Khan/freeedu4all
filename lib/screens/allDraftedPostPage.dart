@@ -11,13 +11,13 @@ class DraftPost extends StatefulWidget {
 }
 
 class _DraftPostState extends State<DraftPost> {
-  String currentUser;
+  String? currentUser;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentUser = firebaseAuth.currentUser.uid;
+    currentUser = firebaseAuth.currentUser!.uid;
   }
 
   @override
@@ -38,12 +38,13 @@ class _DraftPostState extends State<DraftPost> {
           style: kSettingTitle,
         ),
       ),
-      body: StreamBuilder(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance
             .collection("DraftBlog")
             .where("BlogOwnerId", isEqualTo: currentUser)
             .snapshots(),
-        builder: (context, snapshot) {
+        builder: (context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
           if (!snapshot.hasData) {
             return Center(
               child: CircularProgressIndicator(),
@@ -52,8 +53,7 @@ class _DraftPostState extends State<DraftPost> {
 
           return ListView.separated(
             itemBuilder: (context, index) {
-              DocumentSnapshot<Map<String, dynamic>> ds =
-                  snapshot.data.docs[index];
+              var ds = snapshot.data!.docs[index];
               return ListTile(
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
@@ -77,10 +77,10 @@ class _DraftPostState extends State<DraftPost> {
                 subtitle: Text(ds.data()["DateTime"]),
                 isThreeLine: true,
                 trailing: PopupMenuButton(
-                  onSelected: (value) {
+                  onSelected: (String value) {
                     handelSelect(
                       value: value,
-                      currentUser: currentUser,
+                      currentUser: currentUser!,
                       blogPhotoUrl: ds.data()["BlogPhotoUrl"],
                       blogUid: ds.data()["BlogUid"],
                       blogDetail: ds.data()["BlogDetail"],
@@ -103,7 +103,7 @@ class _DraftPostState extends State<DraftPost> {
               indent: 12,
               endIndent: 12,
             ),
-            itemCount: snapshot.data.docs.length,
+            itemCount: snapshot.data!.docs.length,
           );
         },
       ),
@@ -111,12 +111,12 @@ class _DraftPostState extends State<DraftPost> {
   }
 
   handelSelect(
-      {String value,
-      String blogUid,
-      String currentUser,
-      String blogPhotoUrl,
-      String blogTitle,
-      String blogDetail}) {
+      {String? value,
+      String? blogUid,
+      String? currentUser,
+      String? blogPhotoUrl,
+      String? blogTitle,
+      String? blogDetail}) {
     switch (value) {
       case "Edit":
         return Navigator.pushNamed(context, "DraftBlogEditPage",
@@ -128,20 +128,20 @@ class _DraftPostState extends State<DraftPost> {
             ));
       case "Delete":
         return deletePost(
-          blogUid: blogUid,
-          currentUserId: currentUser,
-          blogPhotoUrl: blogPhotoUrl,
+          blogUid: blogUid!,
+          currentUserId: currentUser!,
+          blogPhotoUrl: blogPhotoUrl!,
         );
     }
   }
 
   Delete _delete = Delete();
   deletePost(
-      {String blogUid, String currentUserId, String blogPhotoUrl}) async {
+      {String? blogUid, String? currentUserId, String? blogPhotoUrl}) async {
     await _delete.deleteDaftBlog(
-      blogUid: blogUid,
-      currentUserId: currentUserId,
-      blogPhotoUrl: blogPhotoUrl,
+      blogUid: blogUid!,
+      currentUserId: currentUserId!,
+      blogPhotoUrl: blogPhotoUrl!,
     );
   }
 }

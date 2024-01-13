@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class BlogEditPage extends StatefulWidget {
-  final String blogUid, blogTitle, blogDetail, blogPhoto, blogType;
+  final String? blogUid, blogTitle, blogDetail, blogPhoto, blogType;
   BlogEditPage(
       {this.blogPhoto,
       this.blogType,
@@ -20,28 +20,28 @@ class BlogEditPage extends StatefulWidget {
 }
 
 class _BlogEditPageState extends State<BlogEditPage> {
-  File fileImage;
-  String currentUserId;
-  String _result = "Solution";
+  File? fileImage;
+  String? currentUserId;
+  String? _result = "Solution";
   int _radioValue = 0;
-  TextEditingController _titleController;
-  TextEditingController _detailController;
+  TextEditingController? _titleController;
+  TextEditingController? _detailController;
   bool _inAsyncCall = false;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentUserId = firebaseAuth.currentUser.uid;
+    currentUserId = firebaseAuth.currentUser!.uid;
     _detailController = TextEditingController();
     _titleController = TextEditingController();
-    _titleController.text = widget.blogTitle;
-    _detailController.text = widget.blogDetail;
+    _titleController!.text = widget.blogTitle!;
+    _detailController!.text = widget.blogDetail!;
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _detailController.dispose();
+    _titleController!.dispose();
+    _detailController!.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -202,9 +202,9 @@ class _BlogEditPageState extends State<BlogEditPage> {
 
   PhotoPicker _photoPicker = PhotoPicker();
   FirebaseUpdateDeleteData _updateDeleteData = FirebaseUpdateDeleteData();
-  void _handleRadioValueChange(int value) {
+  void _handleRadioValueChange(int? value) {
     setState(() {
-      _radioValue = value;
+      _radioValue = value!;
 
       switch (_radioValue) {
         case 0:
@@ -237,11 +237,11 @@ class _BlogEditPageState extends State<BlogEditPage> {
     });
     await _updateDeleteData
         .updatePublishPost(
-      blogTitle: _titleController.text,
-      blogDetail: _detailController.text,
-      blogUid: widget.blogUid,
-      fileImage: fileImage,
-      userId: currentUserId,
+      blogTitle: _titleController!.text,
+      blogDetail: _detailController!.text,
+      blogUid: widget.blogUid!,
+      fileImage: fileImage!,
+      userId: currentUserId!,
     )
         .whenComplete(() {
       Navigator.pop(context);
@@ -257,11 +257,11 @@ class _BlogEditPageState extends State<BlogEditPage> {
     });
     await _updateDeleteData
         .draftPostUpdate(
-      blogTitle: _titleController.text,
-      blogDetail: _detailController.text,
-      blogUid: widget.blogUid,
-      fileImage: fileImage,
-      userId: currentUserId,
+      blogTitle: _titleController!.text,
+      blogDetail: _detailController!.text,
+      blogUid: widget.blogUid!,
+      fileImage: fileImage!,
+      userId: currentUserId!,
     )
         .whenComplete(() {
       Navigator.pop(context);
@@ -277,12 +277,12 @@ class _BlogEditPageState extends State<BlogEditPage> {
     });
     await _updateDeleteData
         .publishDraftBlog(
-      blogTitle: _titleController.text,
-      blogDetail: _detailController.text,
-      blogUid: widget.blogUid,
-      fileImage: fileImage,
-      userId: currentUserId,
-      blogType: _result,
+      blogTitle: _titleController!.text,
+      blogDetail: _detailController!.text,
+      blogUid: widget.blogUid!,
+      fileImage: fileImage!,
+      userId: currentUserId!,
+      blogType: _result!,
     )
         .whenComplete(() {
       Navigator.pop(context);

@@ -6,28 +6,28 @@ class LoginToNewUser {
 }
 
 class HomeToBlogRead {
-  String blogUID, blogOwnerID;
+  String? blogUID, blogOwnerID;
   HomeToBlogRead({this.blogUID, this.blogOwnerID});
 }
 
 class BlogReadToComment {
-  String blogUID;
+  String? blogUID;
   BlogReadToComment({this.blogUID});
 }
 
 class BlogToBlogEdit {
-  String blogUid, blogTitle, blogDetail, blogPhoto;
+  String? blogUid, blogTitle, blogDetail, blogPhoto;
   BlogToBlogEdit(
       {this.blogUid, this.blogTitle, this.blogDetail, this.blogPhoto});
 }
 
 class DraftToDraftEdit {
-  String blogUid, blogTitle, blogDetail, blogPhoto;
+  String? blogUid, blogTitle, blogDetail, blogPhoto;
   DraftToDraftEdit(
       {this.blogUid, this.blogTitle, this.blogDetail, this.blogPhoto});
 }
 
 class SettingToReadPrivacy {
-  String text;
+  String? text;
   SettingToReadPrivacy({this.text});
 }

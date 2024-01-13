@@ -10,7 +10,7 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'bottomAppBar.dart';
 
 class AddNewUsersData extends StatefulWidget {
-  final User user;
+  final User? user;
 
   AddNewUsersData({this.user});
 
@@ -19,9 +19,9 @@ class AddNewUsersData extends StatefulWidget {
 }
 
 class _AddNewUsersDataState extends State<AddNewUsersData> {
-  File fileImage;
-  String displayName, aboutUser;
-  String userPhotoUrl;
+  File? fileImage;
+  String? displayName, aboutUser;
+  String? userPhotoUrl;
 
   bool isAllFieldEmpty = true;
 
@@ -116,12 +116,15 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
               width: 90,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50),
-                image: DecorationImage(
-                  image: fileImage == null
-                      ? AssetImage("images/profile.png")
-                      : FileImage(fileImage),
-                  fit: BoxFit.cover,
-                ),
+                image: fileImage == null
+                    ? DecorationImage(
+                        image: AssetImage("images/profile.png"),
+                        fit: BoxFit.cover,
+                      )
+                    : DecorationImage(
+                        image: FileImage(fileImage!),
+                        fit: BoxFit.cover,
+                      ),
               ),
             ),
             Positioned(
@@ -171,7 +174,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
           border: Border.all(color: Colors.black)),
       child: TextField(
         decoration: InputDecoration(
-          hintText: widget.user.email,
+          hintText: widget.user!.email,
           border: InputBorder.none,
         ),
         enabled: false,
@@ -242,11 +245,11 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
         ///addNewUserData
         fireBaseService
             .addNewUserData(
-          fileImage: fileImage,
-          displayName: displayName,
-          aboutUser: aboutUser,
-          userEmail: widget.user.email,
-          userId: widget.user.uid,
+          fileImage: fileImage!,
+          displayName: displayName!,
+          aboutUser: aboutUser!,
+          userEmail: widget.user!.email!,
+          userId: widget.user!.uid,
         )
             .whenComplete(() {
           Navigator.of(context).pushAndRemoveUntil(
@@ -259,7 +262,7 @@ class _AddNewUsersDataState extends State<AddNewUsersData> {
       }
     } catch (e) {
       final snackBar = SnackBar(
-        content: Text(e.message),
+        content: Text(e.toString()),
       );
       // _key.currentState.showSnackBar(snackBar);
       ScaffoldMessenger.of(context).showSnackBar(snackBar);

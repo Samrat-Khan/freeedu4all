@@ -59,8 +59,8 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.black,
-        accentColor: Colors.black,
-        buttonColor: Colors.black,
+        // accentColor: Colors.black,
+        // buttonColor: Colors.black,
         fontFamily: "ubuntu",
       ),
       initialRoute: "/LoginPage",

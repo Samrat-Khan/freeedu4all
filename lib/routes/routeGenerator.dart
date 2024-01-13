@@ -13,7 +13,6 @@ import 'package:education_community/screens/editProfilePage.dart';
 import 'package:education_community/screens/loginPage.dart';
 import 'package:education_community/screens/myProfilePage.dart';
 import 'package:education_community/screens/settingsPage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator {
@@ -27,7 +26,7 @@ class RouteGenerator {
 
       case "AddNewUserDataPage":
         return MaterialPageRoute(builder: (context) {
-          LoginToNewUser loginToNewUser = args;
+          LoginToNewUser loginToNewUser = args as LoginToNewUser;
           return AddNewUsersData(
             user: loginToNewUser.user,
           );
@@ -36,17 +35,17 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (context) => Homepage());
       case "BlogReadPage":
         return MaterialPageRoute(builder: (context) {
-          HomeToBlogRead homeToBlogRead = args;
+          HomeToBlogRead homeToBlogRead = args as HomeToBlogRead;
           return BlogReadingPage(
-            blogUID: homeToBlogRead.blogUID,
-            blogOwnerID: homeToBlogRead.blogOwnerID,
+            blogUID: homeToBlogRead.blogUID!,
+            blogOwnerID: homeToBlogRead.blogOwnerID!,
           );
         });
       case "CommentPage":
         return MaterialPageRoute(builder: (context) {
-          BlogReadToComment blogReadToComment = args;
+          BlogReadToComment blogReadToComment = args as BlogReadToComment;
           return CommentPage(
-            blogUID: blogReadToComment.blogUID,
+            blogUID: blogReadToComment.blogUID!,
           );
         });
       case "BlogPostPage":
@@ -67,31 +66,32 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (context) => DraftPost());
       case "BlogEditPage":
         return MaterialPageRoute(builder: (context) {
-          BlogToBlogEdit blogEdit = args;
+          BlogToBlogEdit blogEdit = args as BlogToBlogEdit;
 
           return BlogEditPage(
-            blogTitle: blogEdit.blogTitle,
-            blogDetail: blogEdit.blogDetail,
-            blogUid: blogEdit.blogUid,
-            blogPhoto: blogEdit.blogPhoto,
+            blogTitle: blogEdit.blogTitle!,
+            blogDetail: blogEdit.blogDetail!,
+            blogUid: blogEdit.blogUid!,
+            blogPhoto: blogEdit.blogPhoto!,
           );
         });
       case "DraftBlogEditPage":
         return MaterialPageRoute(builder: (context) {
-          DraftToDraftEdit blogEdit = args;
+          DraftToDraftEdit blogEdit = args as DraftToDraftEdit;
           return BlogEditPage(
-            blogTitle: blogEdit.blogTitle,
-            blogDetail: blogEdit.blogDetail,
-            blogUid: blogEdit.blogUid,
-            blogPhoto: blogEdit.blogPhoto,
+            blogTitle: blogEdit.blogTitle!,
+            blogDetail: blogEdit.blogDetail!,
+            blogUid: blogEdit.blogUid!,
+            blogPhoto: blogEdit.blogPhoto!,
             blogType: "Draft",
           );
         });
       case "AboutPrivacyPage":
         return MaterialPageRoute(builder: (context) {
-          SettingToReadPrivacy settingToReadPrivacy = args;
+          SettingToReadPrivacy settingToReadPrivacy =
+              args as SettingToReadPrivacy;
           return AboutPrivacyPage(
-            text: settingToReadPrivacy.text,
+            text: settingToReadPrivacy.text!,
           );
         });
       default:

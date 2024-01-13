@@ -5,7 +5,6 @@ import 'package:education_community/services/firebase_service_for_setData.dart';
 import 'package:education_community/services/photo_picker.dart';
 import 'package:education_community/services/user_service.dart';
 import 'package:education_community/widgets/textStyle.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:uuid/uuid.dart';
@@ -294,8 +293,7 @@ class _BlogPostState extends State<BlogPost> {
   /// Field mean all include image but  not radio it's default have a value of "FIX"
   bool checkAllFieldAreFullOrNot() {
     if (_titleTextController.text.isEmpty ||
-        _detailTextController.text.isEmpty ||
-        imageFile == null) {
+        _detailTextController.text.isEmpty) {
       return true;
     } else {
       return false;

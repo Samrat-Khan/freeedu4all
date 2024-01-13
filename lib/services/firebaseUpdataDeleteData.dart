@@ -61,58 +61,22 @@ class FirebaseUpdateDeleteData {
       File photoForCover}) async {
     String userUniqueId = userId;
     String coverPhotoUrl;
-    if (photoForDp != null) {
-      if (photoForCover != null) {
-        String dpPhotoUrl = await photoUpload(
-            whatImage: "UserImage", fileImage: photoForDp, userId: userId);
-        coverPhotoUrl = await photoUpload(
-          whatImage: "CoverImage",
-          userId: userId,
-          fileImage: photoForCover,
-        );
-        await firebaseFirestore.collection("Users").doc(userUniqueId).update(
-          {
-            "PhotoUrl": dpPhotoUrl,
-            "CoverPhotoUrl": coverPhotoUrl,
-            "DisplayName": displayName,
-            "About": bio,
-          },
-        );
-      } else {
-        String dpPhotoUrl = await photoUpload(
-            whatImage: "UserImage", fileImage: photoForDp, userId: userId);
-        await firebaseFirestore.collection("Users").doc(userUniqueId).update(
-          {
-            "PhotoUrl": dpPhotoUrl,
-            "DisplayName": displayName,
-            "About": bio,
-          },
-        );
+    String dpPhotoUrl = await photoUpload(
+        whatImage: "UserImage", fileImage: photoForDp, userId: userId);
+    coverPhotoUrl = await photoUpload(
+      whatImage: "CoverImage",
+      userId: userId,
+      fileImage: photoForCover,
+    );
+    await firebaseFirestore.collection("Users").doc(userUniqueId).update(
+      {
+        "PhotoUrl": dpPhotoUrl,
+        "CoverPhotoUrl": coverPhotoUrl,
+        "DisplayName": displayName,
+        "About": bio,
+      },
+    );
       }
-    } else {
-      if (photoForCover != null) {
-        coverPhotoUrl = await photoUpload(
-          whatImage: "CoverImage",
-          userId: userId,
-          fileImage: photoForCover,
-        );
-        await firebaseFirestore.collection("Users").doc(userUniqueId).update(
-          {
-            "CoverPhotoUrl": coverPhotoUrl,
-            "DisplayName": displayName,
-            "About": bio,
-          },
-        );
-      } else {
-        await firebaseFirestore.collection("Users").doc(userUniqueId).update(
-          {
-            "DisplayName": displayName,
-            "About": bio,
-          },
-        );
-      }
-    }
-  }
 
   Future<String> updateUserProfilePhotoToFireStorage(
       File fileImage, String userId) async {
@@ -140,25 +104,18 @@ class FirebaseUpdateDeleteData {
       String blogUid,
       String userId}) async {
     String photoUrl;
-    if (fileImage != null) {
-      photoUrl = await photoUpload(
-        userId: userId,
-        whatImage: "BlogImage",
-        blogUid: blogUid,
-        fileImage: fileImage,
-      );
-      firebaseFirestore.collection("Blog").doc(blogUid).update({
-        "BlogTitle": blogTitle,
-        "BlogDetail": blogDetail,
-        "BlogPhotoUrl": photoUrl,
-      });
-    } else {
-      firebaseFirestore.collection("Blog").doc(blogUid).update({
-        "BlogTitle": blogTitle,
-        "BlogDetail": blogDetail,
-      });
+    photoUrl = await photoUpload(
+      userId: userId,
+      whatImage: "BlogImage",
+      blogUid: blogUid,
+      fileImage: fileImage,
+    );
+    firebaseFirestore.collection("Blog").doc(blogUid).update({
+      "BlogTitle": blogTitle,
+      "BlogDetail": blogDetail,
+      "BlogPhotoUrl": photoUrl,
+    });
     }
-  }
 
   ///edit Draft blogData
   Future draftPostUpdate(
@@ -169,29 +126,20 @@ class FirebaseUpdateDeleteData {
       String userId}) async {
     String photoUrl;
     String month = monthFormat.getMonth(currentDateTime.month);
-    if (fileImage != null) {
-      photoUrl = await photoUpload(
-        userId: userId,
-        whatImage: "BlogImage",
-        blogUid: blogUid,
-        fileImage: fileImage,
-      );
-      firebaseFirestore.collection("DraftBlog").doc(blogUid).update({
-        "BlogTitle": blogTitle,
-        "BlogDetail": blogDetail,
-        "BlogPhotoUrl": photoUrl,
-        "TimeStamp": currentDateTime.microsecondsSinceEpoch,
-        "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
-      });
-    } else {
-      firebaseFirestore.collection("DraftBlog").doc(blogUid).update({
-        "BlogTitle": blogTitle,
-        "BlogDetail": blogDetail,
-        "TimeStamp": currentDateTime.microsecondsSinceEpoch,
-        "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
-      });
+    photoUrl = await photoUpload(
+      userId: userId,
+      whatImage: "BlogImage",
+      blogUid: blogUid,
+      fileImage: fileImage,
+    );
+    firebaseFirestore.collection("DraftBlog").doc(blogUid).update({
+      "BlogTitle": blogTitle,
+      "BlogDetail": blogDetail,
+      "BlogPhotoUrl": photoUrl,
+      "TimeStamp": currentDateTime.microsecondsSinceEpoch,
+      "DateTime": "$month ${currentDateTime.day} ${currentDateTime.year}",
+    });
     }
-  }
 
   ///publish Draft Blog
   Future publishDraftBlog(
@@ -223,20 +171,16 @@ class Delete {
   Future deleteDaftBlog(
       {String blogUid, String currentUserId, String blogPhotoUrl}) async {
     await _firestore.collection("DraftBlog").doc(blogUid).delete();
-    if (blogPhotoUrl != null) {
-      Reference ref = _storage.refFromURL(blogPhotoUrl);
-      ref.delete();
+    Reference ref = _storage.refFromURL(blogPhotoUrl);
+    ref.delete();
     }
-  }
 
   Future deletePublishBlog(
       {String blogUid, String currentUserId, String blogPhotoUrl}) async {
     await _firestore.collection("Blog").doc(blogUid).delete();
-    if (blogPhotoUrl != null) {
-      Reference ref = _storage.refFromURL(blogPhotoUrl);
-      ref.delete();
-    }
-
+    Reference ref = _storage.refFromURL(blogPhotoUrl);
+    ref.delete();
+  
     await _firestore
         .collection("Comments")
         .where("BlogUID", isEqualTo: blogUid)

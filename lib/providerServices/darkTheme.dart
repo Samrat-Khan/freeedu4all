@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class DarkToLightTheme with ChangeNotifier {
   final String key = "Dark";
   bool _isDark = false;
-  SharedPreferences _preferences;
+  SharedPreferences? _preferences;
   bool get isDark => _isDark;
 
   changeTheme(bool value) async {
@@ -24,6 +24,6 @@ class DarkToLightTheme with ChangeNotifier {
   // }
 
   _savePrep() async {
-    _preferences.setBool(key, _isDark);
+    await _preferences!.setBool(key, _isDark);
   }
 }

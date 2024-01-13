@@ -428,27 +428,21 @@ class _LogInPageState extends State<LogInPage> {
 
       User user = await _emailAuth.getCurrentUser();
 
-      if (user == null) {
+      bool isEmailVerify = await _emailAuth.isEmailVerify();
+      Provider.of<UserProvider>(context, listen: false).getUser(user.uid);
+      if (!isEmailVerify) {
+        await _emailAuth.verifyEmail();
+        Navigator.pushReplacementNamed(context, "BottomAppBar");
         setState(() {
           _inAsyncCall = false;
         });
       } else {
-        bool isEmailVerify = await _emailAuth.isEmailVerify();
-        Provider.of<UserProvider>(context, listen: false).getUser(user.uid);
-        if (!isEmailVerify) {
-          await _emailAuth.verifyEmail();
-          Navigator.pushReplacementNamed(context, "BottomAppBar");
-          setState(() {
-            _inAsyncCall = false;
-          });
-        } else {
-          Navigator.pushReplacementNamed(context, "BottomAppBar");
-          setState(() {
-            _inAsyncCall = false;
-          });
-        }
+        Navigator.pushReplacementNamed(context, "BottomAppBar");
+        setState(() {
+          _inAsyncCall = false;
+        });
       }
-    } catch (e) {}
+        } catch (e) {}
   }
 }
 
